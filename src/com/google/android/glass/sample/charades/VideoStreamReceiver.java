@@ -50,7 +50,7 @@ public class VideoStreamReceiver extends AsyncTask<TextView, Bitmap, Void> {
         String receivedString = "NONE";
         try {
             logd("creating Socket");
-            socket = new Socket("192.168.1.218", PORT_NUMBER);
+            socket = new Socket("192.168.1.100", PORT_NUMBER);
             audioManager.playSoundEffect(Sounds.SUCCESS);
             logd("connected...");
 
@@ -59,7 +59,7 @@ public class VideoStreamReceiver extends AsyncTask<TextView, Bitmap, Void> {
 
             while (socket.isConnected() && !isCancelled()) {
                 // Send pull picture command.
-                SendString(outputStream,"PULL_PIC");
+                SendString(outputStream,"GET_PICTURE");
 
                 // Receive picture.
                 Bitmap picture = ReceiveBitmap(inputStream);
