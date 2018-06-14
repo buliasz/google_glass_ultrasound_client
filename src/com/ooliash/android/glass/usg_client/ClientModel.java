@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.android.glass.sample.charades;
+package com.ooliash.android.glass.usg_client;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Represents the state of the USG client. This class is serializable so that it can be stored in an

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.glass.sample.charades;
+package com.ooliash.android.glass.usg_client;
 
 import com.google.android.glass.touchpad.Gesture;
 

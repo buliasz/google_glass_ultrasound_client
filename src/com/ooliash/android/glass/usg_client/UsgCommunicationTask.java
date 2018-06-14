@@ -1,6 +1,5 @@
-package com.google.android.glass.sample.charades;
+package com.ooliash.android.glass.usg_client;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,22 +15,37 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.concurrent.ArrayBlockingQueue;
 
-public class VideoStreamReceiver extends AsyncTask<TextView, Bitmap, Void> {
+public class UsgCommunicationTask extends AsyncTask<TextView, Bitmap, Void> {
     private static final int PORT_NUMBER = 9050;
+    private static final int COMMAND_QUEUE_CAPACITY = 10;
     private static final int BUFFER_SIZE = 128*1024;
+    private static final String LOG_TAG = "USG";
+
     private static TextView textView;
     private static byte[] intBuffer = new byte[4];
     private static byte[] dataBuffer = new byte[BUFFER_SIZE];
     private final AudioManager audioManager;
     private Socket socket;
+    private ArrayBlockingQueue<String> commandQueue =
+            new ArrayBlockingQueue<String>(COMMAND_QUEUE_CAPACITY);
 
-    public VideoStreamReceiver(AudioManager audioManager) {
+    public UsgCommunicationTask(AudioManager audioManager) {
         this.audioManager = audioManager;
     }
 
     private void logd(String text) {
-        Log.d("VSR", text);
+        Log.d(LOG_TAG, text);
+    }
+
+    public void SendCommand(String command) {
+        try {
+            commandQueue.put(command);
+        } catch (InterruptedException e) {
+            Log.e(LOG_TAG, "Cannot put new command to the command queue: "
+                    + e.getMessage());
+        }
     }
 
     /**
@@ -47,7 +61,6 @@ public class VideoStreamReceiver extends AsyncTask<TextView, Bitmap, Void> {
     @Override
     protected Void doInBackground(TextView... textViews) {
         textView = textViews[0];
-        String receivedString = "NONE";
         try {
             logd("creating Socket");
             socket = new Socket("192.168.1.100", PORT_NUMBER);
@@ -58,8 +71,12 @@ public class VideoStreamReceiver extends AsyncTask<TextView, Bitmap, Void> {
             OutputStream outputStream = socket.getOutputStream();
 
             while (socket.isConnected() && !isCancelled()) {
+                String command = commandQueue.poll();
+                if (command == null) {
+                    command = "GET_PICTURE";
+                }
                 // Send pull picture command.
-                SendString(outputStream,"GET_PICTURE");
+                SendString(outputStream,command);
 
                 // Receive picture.
                 Bitmap picture = ReceiveBitmap(inputStream);
@@ -84,10 +101,7 @@ public class VideoStreamReceiver extends AsyncTask<TextView, Bitmap, Void> {
 
     private Bitmap ReceiveBitmap(InputStream inputStream) throws IOException {
         int length = ReceiveByteArray(inputStream);
-        String receivedString = "Received " + length + " bytes.";
-//                + "\nFirst: " + (dataBuffer[0] & 0xFF) + " " + (dataBuffer[1] & 0xFF) + "\n" +
-//                "Last: " + (dataBuffer[length - 1] & 0xFF) + " " + (dataBuffer[length - 2] & 0xFF);
-        logd(receivedString);
+        logd("Received " + length + " bytes.");
         return BitmapFactory.decodeByteArray(dataBuffer, 0, length);
     }
 

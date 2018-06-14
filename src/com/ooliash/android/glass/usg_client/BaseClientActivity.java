@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.glass.sample.charades;
+package com.ooliash.android.glass.usg_client;
 
 import com.google.android.glass.media.Sounds;
 import com.google.android.glass.touchpad.Gesture;
@@ -133,7 +133,7 @@ public abstract class BaseClientActivity extends Activity {
      */
     private Animation tugRightAnimation;
     private boolean isConnected = false;
-    private VideoStreamReceiver receiver;
+    private UsgCommunicationTask receiver;
     int batteryLevel = 0;
 
     private BroadcastReceiver batteryInfoReceiver = new BroadcastReceiver() {
@@ -141,7 +141,7 @@ public abstract class BaseClientActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
             batteryLevel = level;
-            Log.i("VSR", "BATTERY LEVEL: " + batteryLevel);
+            Log.i("USG", "BATTERY LEVEL: " + batteryLevel);
             updateBatteryBar();
         }
     };
@@ -156,7 +156,7 @@ public abstract class BaseClientActivity extends Activity {
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         gestureDetector = new GestureDetector(this).setBaseListener(mBaseListener);
 
-        receiver = new VideoStreamReceiver(audioManager);
+        receiver = new UsgCommunicationTask(audioManager);
         viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
         batteryState = (TextView) findViewById(R.id.battery_state);
         tugRightAnimation = AnimationUtils.loadAnimation(this, R.anim.tug_right);
@@ -167,6 +167,7 @@ public abstract class BaseClientActivity extends Activity {
 
         model = createClientModel();
         updateDisplay();
+        Log.e("USG", "Base client activity created");
     }
 
     @Override
