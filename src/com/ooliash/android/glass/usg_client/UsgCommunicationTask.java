@@ -24,7 +24,7 @@ public class UsgCommunicationTask extends AsyncTask<TextView, Bitmap, Void> {
     private static final int BUFFER_SIZE = 128*1024;
     private static final String LOG_TAG = "USG";
 
-    private static TextView textView;
+    private static TextView publishingTextView;
     private static byte[] intBuffer = new byte[4];
     private static byte[] dataBuffer = new byte[BUFFER_SIZE];
     private final AudioManager audioManager;
@@ -34,6 +34,7 @@ public class UsgCommunicationTask extends AsyncTask<TextView, Bitmap, Void> {
     private int transferred = 0;
     private TextView networkIndicatorTextView;
     private int networkIndicatorColor = Color.WHITE;
+    private String publishString = null;
 
     public UsgCommunicationTask(AudioManager audioManager) {
         this.audioManager = audioManager;
@@ -64,7 +65,7 @@ public class UsgCommunicationTask extends AsyncTask<TextView, Bitmap, Void> {
      */
     @Override
     protected Void doInBackground(TextView... textViews) {
-        textView = textViews[0];
+        publishingTextView = textViews[0];
         networkIndicatorTextView = textViews[1];
         try {
             logd("creating Socket");
@@ -106,6 +107,11 @@ public class UsgCommunicationTask extends AsyncTask<TextView, Bitmap, Void> {
                     // Show picture.
                     publishProgress(picture);
                 }
+                if (command == "GAIN_UP" || command == "GAIN_DOWN"
+                        || command == "AREA_UP" || command == "AREA_DOWN") {
+                    publishString = ReceiveString(inputStream);
+                    publishProgress();
+                }
             }
 
             socket.close();
@@ -120,6 +126,11 @@ public class UsgCommunicationTask extends AsyncTask<TextView, Bitmap, Void> {
         byte[] bytesToSend = text.getBytes();
         outputStream.write(IntToByteArray(bytesToSend.length));
         outputStream.write(bytesToSend);
+    }
+
+    private String ReceiveString(InputStream inputStream) throws IOException {
+        int length = ReceiveByteArray(inputStream);
+        return new String(dataBuffer, 0, length);
     }
 
     private Bitmap ReceiveBitmap(InputStream inputStream) throws IOException {
@@ -179,13 +190,17 @@ public class UsgCommunicationTask extends AsyncTask<TextView, Bitmap, Void> {
     @Override
     protected void onProgressUpdate(Bitmap... progressData) {
         if (progressData.length == 0) {
+            if (publishString != null) {
+                publishingTextView.setText(publishString);
+                publishString = null;
+            }
             networkIndicatorTextView.setTextColor(networkIndicatorColor);
             return;
         }
         transferred += progressData[0].getAllocationByteCount();
-//        textView.setText(Integer.toString(transferred));
+//        publishingTextView.setText(Integer.toString(transferred));
         BitmapDrawable drawable = new BitmapDrawable(Resources.getSystem(), progressData[0]);
-        textView.setBackground(drawable);
+        publishingTextView.setBackground(drawable);
     }
 
     public boolean isConnected() {
