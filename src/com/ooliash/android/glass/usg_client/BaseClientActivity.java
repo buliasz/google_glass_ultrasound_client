@@ -60,9 +60,19 @@ public abstract class BaseClientActivity extends Activity {
     private static final char BATTERY_FILLED_PART_CHARACTER = '\u25a0';
 
     /**
+     * Full circle character used for network indicator.
+     */
+    private static final char FULL_CIRCLE_CHARACTER = '\u25cf';
+
+    /**
      * The Unicode character for the empty parallelogram, representing empty battery part.
      */
     private static final char BATTERY_EMPTY_PART_CHARACTER = '\u25a1';
+
+    /**
+     * Logging tag.
+     */
+    private static final String LOG_TAG = "USG";
 
     /**
      * Handler used to post a delayed animation when a view is changed.
@@ -76,21 +86,7 @@ public abstract class BaseClientActivity extends Activity {
         @Override
         public boolean onGesture(Gesture gesture) {
             if (areGesturesEnabled()) {
-                switch (gesture) {
-                    case SWIPE_LEFT:
-                        // Swipe left (backward) is always handled here to provide a brief
-                        // "disallowed" tug animation.
-                        tugSwipe();
-                        return true;
-                    case TAP:
-                    case SWIPE_RIGHT:
-                        // Delegate tap and swipe right (forward) to the subclass so that it
-                        // can be handled differently.
-                        handleGesture(gesture);
-                        return true;
-                    default:
-                        return false;
-                }
+                return handleGesture(gesture);
             }
             return false;
         }
@@ -129,11 +125,16 @@ public abstract class BaseClientActivity extends Activity {
     private TextView batteryState;
 
     /**
+     * TextView containing network transfer indicator.
+     */
+    private TextView networkIndicator;
+
+    /**
      * Animation used to briefly tug a view when the user swipes left.
      */
     private Animation tugRightAnimation;
     private boolean isConnected = false;
-    private UsgCommunicationTask receiver;
+    protected UsgCommunicationTask receiver;
     int batteryLevel = 0;
 
     private BroadcastReceiver batteryInfoReceiver = new BroadcastReceiver() {
@@ -145,6 +146,11 @@ public abstract class BaseClientActivity extends Activity {
             updateBatteryBar();
         }
     };
+
+    /**
+     * Current TextView.
+     */
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,6 +164,8 @@ public abstract class BaseClientActivity extends Activity {
 
         receiver = new UsgCommunicationTask(audioManager);
         viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
+        networkIndicator = (TextView) findViewById(R.id.network_indicator);
+        networkIndicator.setText(Character.toString(FULL_CIRCLE_CHARACTER));
         batteryState = (TextView) findViewById(R.id.battery_state);
         tugRightAnimation = AnimationUtils.loadAnimation(this, R.anim.tug_right);
 
@@ -185,7 +193,7 @@ public abstract class BaseClientActivity extends Activity {
      * Subclasses must override this method to handle {@link Gesture#TAP} and
      * {@link Gesture#SWIPE_RIGHT} gestures that occur during application.
      */
-    protected abstract void handleGesture(Gesture gesture);
+    protected abstract boolean handleGesture(Gesture gesture);
 
     /** Returns the data model used by this instance of the client. */
     protected ClientModel getClientModel() {
@@ -222,49 +230,50 @@ public abstract class BaseClientActivity extends Activity {
      * @param color Text color.
      * @param size Text size.
      */
-    private void changeMainText(String text, int color, float size) {
-        TextView textView = getCurrentTextView();
+    protected void changeMainText(String text, int color, float size) {
+        textView = getCurrentTextView();
         textView.setText(text);
         textView.setTextSize(size);
         textView.setTextColor(color);
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                textView.setText("");
+            }
+        }, 1500);
     }
 
-    /**
-     * Tap gesture callback.
-     */
-    protected void onGestureTap() {
-        TextView textView = getCurrentTextView();
+    protected void startConnectionToUsg() {
         if (!receiver.isConnected()) {
             changeMainText(
-                    "Connecting to PJA USG...\nTap again to stop the transfer...",
+                    "Connecting to PJA USG...",
                     Color.RED,
                     26.5f);
-            receiver.execute(getCurrentTextView());
+            receiver.execute(getCurrentTextView(), networkIndicator);
+            changeMainText("Connected", Color.GREEN, 26.5f);
         } else {
-            changeMainText(
-                    "Disconnecting from PJA USG...\nTap to start the transfer again...",
-                    Color.RED,
-                    26.5f);
-            receiver.cancel(false);
+            Log.e(LOG_TAG, "I'm already connected to USG.");
         }
     }
 
-    /**
-     * Advances to the next card.
-     */
-    protected void onGestureSwipeRight() {
-        playSoundEffect(Sounds.SELECTED);
-        viewFlipper.showNext();
-        updateDisplay();
+    protected void stopConnectionToUsg() {
+        if (receiver.isConnected()) {
+            changeMainText(
+                    "Disconnecting from PJA USG...",
+                    Color.RED,
+                    26.5f);
+            receiver.cancel(true);
+            changeMainText("Disconnected", Color.GREEN, 26.5f);
+        } else {
+            Log.e(LOG_TAG, "I'm not connected to any USG.");
+        }
     }
 
+
     /**
-     * Updates the main label and battery bar with the current state.
+     * Updates the display state.
      */
     private void updateDisplay() {
-        getCurrentTextView().setText("Tap to connect to PJA USG");
-        getCurrentTextView().setTextColor(Color.WHITE);
-        batteryState.setText(buildBatteryBar());
     }
 
 

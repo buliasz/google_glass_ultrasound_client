@@ -3,6 +3,7 @@ package com.ooliash.android.glass.usg_client;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.os.AsyncTask;
@@ -30,6 +31,9 @@ public class UsgCommunicationTask extends AsyncTask<TextView, Bitmap, Void> {
     private Socket socket;
     private ArrayBlockingQueue<String> commandQueue =
             new ArrayBlockingQueue<String>(COMMAND_QUEUE_CAPACITY);
+    private int transferred = 0;
+    private TextView networkIndicatorTextView;
+    private int networkIndicatorColor = Color.WHITE;
 
     public UsgCommunicationTask(AudioManager audioManager) {
         this.audioManager = audioManager;
@@ -61,6 +65,7 @@ public class UsgCommunicationTask extends AsyncTask<TextView, Bitmap, Void> {
     @Override
     protected Void doInBackground(TextView... textViews) {
         textView = textViews[0];
+        networkIndicatorTextView = textViews[1];
         try {
             logd("creating Socket");
             socket = new Socket("192.168.1.100", PORT_NUMBER);
@@ -73,16 +78,34 @@ public class UsgCommunicationTask extends AsyncTask<TextView, Bitmap, Void> {
             while (socket.isConnected() && !isCancelled()) {
                 String command = commandQueue.poll();
                 if (command == null) {
-                    command = "GET_PICTURE";
+                    command = "GET_PICTURE";    // Send pull picture command if queue is empty.
                 }
-                // Send pull picture command.
+//                Available commands:
+//                "GET_PICTURE"
+//                "FREEZE"
+//                "GAIN_UP"
+//                "GAIN_DOWN"
+//                "AREA_UP"
+//                "AREA_DOWN"
+//                "HIDE"
+//                "SAVE"
+//                "8BIT_GRAYSCALE"
+//                "GET_GAIN"
+//                "GET_TX_FREQUENCY"
+//                "GET_TX_TYPE"
+//                "GET_IMAGING_RANGE"
+//                "GET_FPS"
+
+                logd("Sending " + command + " command");
                 SendString(outputStream,command);
 
-                // Receive picture.
-                Bitmap picture = ReceiveBitmap(inputStream);
+                if (command == "GET_PICTURE") {
+                    // Receive picture.
+                    Bitmap picture = ReceiveBitmap(inputStream);
 
-                // Show picture.
-                publishProgress(picture);
+                    // Show picture.
+                    publishProgress(picture);
+                }
             }
 
             socket.close();
@@ -106,7 +129,8 @@ public class UsgCommunicationTask extends AsyncTask<TextView, Bitmap, Void> {
     }
 
     private int ReceiveByteArray(InputStream inputStream) throws IOException {
-        logd("receiving data length...");
+        networkIndicateStarted();
+//        logd("receiving data length...");
         int length = ReceiveInt(inputStream);
 
         if (length <= 0 || length > BUFFER_SIZE) {
@@ -118,10 +142,21 @@ public class UsgCommunicationTask extends AsyncTask<TextView, Bitmap, Void> {
         int received = 0;
         while (received < length) {
             received += inputStream.read(dataBuffer, received, length - received);
-            logd("Received " + received + "/" + length);
+//            logd("Received " + received + "/" + length);
         }
+        networkIndicateStopped();
 
         return length;
+    }
+
+    private void networkIndicateStarted() {
+        networkIndicatorColor = Color.RED;
+        publishProgress();
+    }
+
+    private void networkIndicateStopped() {
+        networkIndicatorColor = Color.BLACK;
+        publishProgress();
     }
 
     private int ReceiveInt(InputStream inputStream) throws IOException {
@@ -143,7 +178,12 @@ public class UsgCommunicationTask extends AsyncTask<TextView, Bitmap, Void> {
 
     @Override
     protected void onProgressUpdate(Bitmap... progressData) {
-        textView.setText(Integer.toString(progressData[0].getAllocationByteCount()));
+        if (progressData.length == 0) {
+            networkIndicatorTextView.setTextColor(networkIndicatorColor);
+            return;
+        }
+        transferred += progressData[0].getAllocationByteCount();
+//        textView.setText(Integer.toString(transferred));
         BitmapDrawable drawable = new BitmapDrawable(Resources.getSystem(), progressData[0]);
         textView.setBackground(drawable);
     }

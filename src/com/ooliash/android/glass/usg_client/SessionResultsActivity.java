@@ -134,7 +134,7 @@ public class SessionResultsActivity extends Activity {
      * Starts a new video transfer activity and finishes this result activity.
      */
     private void startUsgTransfer() {
-        startActivity(new Intent(this, VideoTransferActivity.class));
+        startActivity(new Intent(this, UsgMainActivity.class));
         finish();
     }
 }

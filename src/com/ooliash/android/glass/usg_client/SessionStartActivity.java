@@ -124,7 +124,7 @@ public class SessionStartActivity extends Activity {
      * to the splash screen when they exit.
      */
     private void startVideoTransfer() {
-        startActivity(new Intent(this, VideoTransferActivity.class));
+        startActivity(new Intent(this, UsgMainActivity.class));
         finish();
     }
 

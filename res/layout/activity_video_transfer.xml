@@ -73,7 +73,15 @@
             android:id="@+id/timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/timer_margin_left"
+            android:layout_marginLeft="@dimen/tip_split_size"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            />
+
+        <TextView
+            android:id="@+id/network_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/tip_split_size"
             android:textAppearance="?android:attr/textAppearanceSmall"
             />
 

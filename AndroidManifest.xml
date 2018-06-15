@@ -43,7 +43,7 @@
                 />
         </activity>
 
-        <activity android:name="com.ooliash.android.glass.usg_client.VideoTransferActivity" />
+        <activity android:name="com.ooliash.android.glass.usg_client.UsgMainActivity" />
 
         <activity android:name="com.ooliash.android.glass.usg_client.TutorialActivity" />
 
