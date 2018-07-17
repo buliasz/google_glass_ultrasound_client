@@ -16,7 +16,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 
-public class SocketCommunication {
+public class WindowsSocketCommunication {
     // Constants.
     private static final String LOG_TAG = "USG";
     private static final int PORT_NUMBER = 9050;

@@ -34,7 +34,7 @@ import android.view.MotionEvent;
  * The initial splash screen activity in the application that displays a "Start transfer" prompt and
  * allows the user to tap to access the instructions.
  */
-public class SessionStartActivity extends Activity {
+public class ApplicationMainActivity extends Activity {
 
     /**
      * Handler used to post requests to start new activities so that the menu closing animation

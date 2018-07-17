@@ -139,16 +139,6 @@ public class UsgMainActivity extends BaseClientActivity {
     }
 
     /**
-     * Called to finish the USG maintenance activity and display the results screen.
-     */
-    private void endUsgMaintenance() {
-        Intent intent = new Intent(this, SessionResultsActivity.class);
-        intent.putExtra(SessionResultsActivity.EXTRA_MODEL, getClientModel());
-        startActivity(intent);
-        finish();
-    }
-
-    /**
      * Gesture callbacks.
      */
     protected void onGestureTap() {

@@ -1,28 +1,17 @@
 package com.ooliash.android.glass.usg_client;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.os.AsyncTask;
-import android.os.StrictMode;
 import android.util.Log;
 import android.widget.TextView;
 
 import com.google.android.glass.media.Sounds;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InterruptedIOException;
-import java.io.OutputStream;
 import java.lang.ref.WeakReference;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -53,7 +42,7 @@ class UsgCommunicationTask extends AsyncTask<Void, String, Void> {
     private static final String COMMAND_NETWORK_STATUS = "NETWORK_STATUS";
 
     // Other fields.
-    private final SocketCommunication communication;
+    private final WindowsSocketCommunication communication;
     private final WeakReference<UsgMainActivity> contextWR;
 
     private ArrayBlockingQueue<String> commandQueue =
@@ -64,7 +53,7 @@ class UsgCommunicationTask extends AsyncTask<Void, String, Void> {
 
     UsgCommunicationTask(UsgMainActivity context) {
         contextWR = new WeakReference<UsgMainActivity>(context);
-        communication = new SocketCommunication();
+        communication = new WindowsSocketCommunication();
     }
 
     void SendCommand(String command) {
