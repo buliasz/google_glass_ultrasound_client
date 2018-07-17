@@ -23,15 +23,20 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.TextView;
+
+import java.util.Locale;
 
 /**
  * Implementation of the main activity: transfers video and allows additional gestures.
  */
 public class UsgMainActivity extends BaseClientActivity {
 
+    private static final String LOG_TAG = "USG";
     private int numberOfParams = 2;
-    private int highlighedParam = 0;
+    private int highlightedParam = 0;
+    private UsgCommunicationTask usgCommunicationTask;
 
     /**
      * Handler used to keep the timer ticking once per second.
@@ -63,6 +68,7 @@ public class UsgMainActivity extends BaseClientActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        usgCommunicationTask = new UsgCommunicationTask(this);
         mTimer = (TextView) findViewById(R.id.timer);
     }
 
@@ -78,8 +84,8 @@ public class UsgMainActivity extends BaseClientActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        cancelUsgCommunicationTask();
         mHandler.removeCallbacks(mTick);
-        stopConnectionToUsg();
     }
 
     /**
@@ -108,8 +114,8 @@ public class UsgMainActivity extends BaseClientActivity {
             case SWIPE_DOWN:
                 onGestureSwipeDown();
                 break;
-            case TWO_TAP:
-                tempText("AREA DOWN");
+            case TWO_LONG_PRESS:
+                permText("EXITING...");
                 this.finish();
                 break;
             default:
@@ -127,7 +133,7 @@ public class UsgMainActivity extends BaseClientActivity {
     private void updateTimer() {
         // The code point U+EE01 in Roboto is the vertically centered colon used in the clock on
         // the Glass home screen.
-        String timeString = String.format(
+        String timeString = String.format(Locale.ENGLISH,
             "%d\uee01%02d", sessionTime / 60, sessionTime % 60);
         mTimer.setText(timeString);
     }
@@ -146,46 +152,72 @@ public class UsgMainActivity extends BaseClientActivity {
      * Gesture callbacks.
      */
     protected void onGestureTap() {
-        receiver.SendCommand("FREEZE");
-        tempText("FREEZE");
+        usgCommunicationTask.SendCommand("FREEZE");
+        permText("FREEZE");
     }
 
     protected void onGestureSwipeLeft() {
         playSoundEffect(Sounds.TAP);
-        receiver.SendCommand("AREA_UP");
+        usgCommunicationTask.SendCommand("AREA_UP");
 //        updateDisplay();
-        tempText("AREA UP");
+        permText("AREA UP");
     }
 
     private void highlightPrevoiusParam() {
-        highlighedParam = highlighedParam > 0 ? highlighedParam - 1 : numberOfParams - 1;
+        highlightedParam = highlightedParam > 0 ? highlightedParam - 1 : numberOfParams - 1;
     }
 
     protected void onGestureSwipeRight() {
         playSoundEffect(Sounds.TAP);
-//        highlightNextParam();
-//        updateDisplay();
-        receiver.SendCommand("AREA_DOWN");
-        tempText("AREA DOWN");
+        usgCommunicationTask.SendCommand("AREA_DOWN");
+        permText("AREA DOWN");
     }
 
     private void highlightNextParam() {
-        highlighedParam = (highlighedParam + 1) % numberOfParams;
+        highlightedParam = (highlightedParam + 1) % numberOfParams;
     }
 
     protected void onGestureSwipeUp() {
         playSoundEffect(Sounds.TAP);
-        tempText("GAIN UP");
-        receiver.SendCommand("GAIN_UP");
+        permText("GAIN UP");
+        usgCommunicationTask.SendCommand("GAIN_UP");
     }
 
     protected void onGestureSwipeDown() {
         playSoundEffect(Sounds.TAP);
-        tempText("GAIN_DOWN");
+        permText("GAIN_DOWN");
+        usgCommunicationTask.SendCommand("GAIN_DOWN");
     }
 
-    private void tempText(String text) {
-        changeMainText(text, Color.WHITE, 16.5f);
+    private void permText(String text) {
+        changeMainText(text, Color.WHITE, 16.5f, 0);
     }
 
+    void errorMessage(String text) {
+        changeMainText(text, Color.RED, 16.5f, 2000);
+    }
+
+
+    protected void startConnectionToUsg() {
+        Log.d(LOG_TAG, "Starting communication task...");
+        changeMainText(
+                "Connecting to PJA USG...",
+                Color.RED,
+                26.5f,
+                0);
+        usgCommunicationTask.execute();
+    }
+
+    protected void cancelUsgCommunicationTask() {
+        if (!usgCommunicationTask.isCancelled()) {
+            changeMainText(
+                    "Disconnecting from PJA USG...",
+                    Color.RED,
+                    26.5f, 0);
+            usgCommunicationTask.cancel(true);
+            changeMainText("Disconnected", Color.GREEN, 26.5f, 1000);
+        } else {
+            Log.e(LOG_TAG, "I'm not connected to any USG.");
+        }
+    }
 }

@@ -16,7 +16,6 @@
 
 package com.ooliash.android.glass.usg_client;
 
-import com.google.android.glass.media.Sounds;
 import com.google.android.glass.touchpad.Gesture;
 import com.google.android.glass.touchpad.GestureDetector;
 
@@ -85,17 +84,14 @@ public abstract class BaseClientActivity extends Activity {
     private final GestureDetector.BaseListener mBaseListener = new GestureDetector.BaseListener() {
         @Override
         public boolean onGesture(Gesture gesture) {
-            if (areGesturesEnabled()) {
-                return handleGesture(gesture);
-            }
-            return false;
+            return areGesturesEnabled() && handleGesture(gesture);
         }
     };
 
     /**
      * Audio manager used to play system sound effects.
      */
-    private AudioManager audioManager;
+    protected AudioManager audioManager;
 
     /**
      * Detects gestures during the application.
@@ -127,23 +123,21 @@ public abstract class BaseClientActivity extends Activity {
     /**
      * TextView containing network transfer indicator.
      */
-    private TextView networkIndicator;
+    protected TextView networkIndicatorTextView;
 
     /**
      * Animation used to briefly tug a view when the user swipes left.
      */
     private Animation tugRightAnimation;
     private boolean isConnected = false;
-    protected UsgCommunicationTask receiver;
     int batteryLevel = 0;
 
     private BroadcastReceiver batteryInfoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-            batteryLevel = level;
-            Log.i("USG", "BATTERY LEVEL: " + batteryLevel);
-            updateBatteryBar();
+            batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+//            Log.d(LOG_TAG, "BATTERY LEVEL: " + batteryLevel);
+            batteryState.setText(buildBatteryBar());
         }
     };
 
@@ -151,10 +145,14 @@ public abstract class BaseClientActivity extends Activity {
      * Current TextView.
      */
     private TextView textView;
+    protected TextView gainTextView;
+    protected TextView areaTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.d(LOG_TAG, "Application startup.");
 
         setContentView(R.layout.activity_video_transfer);
         setGesturesEnabled(true);
@@ -162,11 +160,15 @@ public abstract class BaseClientActivity extends Activity {
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         gestureDetector = new GestureDetector(this).setBaseListener(mBaseListener);
 
-        receiver = new UsgCommunicationTask(audioManager);
         viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
-        networkIndicator = (TextView) findViewById(R.id.network_indicator);
-        networkIndicator.setText(Character.toString(FULL_CIRCLE_CHARACTER));
+
+        networkIndicatorTextView = (TextView) findViewById(R.id.network_indicator);
+        networkIndicatorTextView.setText(Character.toString(FULL_CIRCLE_CHARACTER));
+        networkIndicatorTextView.setTextColor(Color.DKGRAY);
+        gainTextView = (TextView) findViewById(R.id.gain_value);
+        areaTextView = (TextView) findViewById(R.id.area_value);
         batteryState = (TextView) findViewById(R.id.battery_state);
+
         tugRightAnimation = AnimationUtils.loadAnimation(this, R.anim.tug_right);
 
         this.registerReceiver(
@@ -175,7 +177,7 @@ public abstract class BaseClientActivity extends Activity {
 
         model = createClientModel();
         updateDisplay();
-        Log.e("USG", "Base client activity created");
+//        Log.d(LOG_TAG, "Base client activity created");
     }
 
     @Override
@@ -230,45 +232,26 @@ public abstract class BaseClientActivity extends Activity {
      * @param color Text color.
      * @param size Text size.
      */
-    protected void changeMainText(String text, int color, float size) {
+    protected void changeMainText(String text, int color, float size, long delayMilis) {
         textView = getCurrentTextView();
         textView.setText(text);
         textView.setTextSize(size);
         textView.setTextColor(color);
-        mHandler.postDelayed(new Runnable() {
+        if (delayMilis > 0) {
+            mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 textView.setText("");
             }
-        }, 1500);
-    }
-
-    protected void startConnectionToUsg() {
-        if (!receiver.isConnected()) {
-            changeMainText(
-                    "Connecting to PJA USG...",
-                    Color.RED,
-                    26.5f);
-            receiver.execute(getCurrentTextView(), networkIndicator);
-            changeMainText("Connected", Color.GREEN, 26.5f);
-        } else {
-            Log.e(LOG_TAG, "I'm already connected to USG.");
+        }, delayMilis);
         }
     }
 
-    protected void stopConnectionToUsg() {
-        if (receiver.isConnected()) {
-            changeMainText(
-                    "Disconnecting from PJA USG...",
-                    Color.RED,
-                    26.5f);
-            receiver.cancel(true);
-            changeMainText("Disconnected", Color.GREEN, 26.5f);
-        } else {
-            Log.e(LOG_TAG, "I'm not connected to any USG.");
-        }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        this.unregisterReceiver(this.batteryInfoReceiver);
     }
-
 
     /**
      * Updates the display state.
@@ -276,10 +259,6 @@ public abstract class BaseClientActivity extends Activity {
     private void updateDisplay() {
     }
 
-
-    private void updateBatteryBar() {
-        batteryState.setText(buildBatteryBar());
-    }
 
     /**
      * Builds and returns a spanned string containing colorized battery level status.
@@ -310,7 +289,7 @@ public abstract class BaseClientActivity extends Activity {
     }
 
     /** Returns the {@code TextView} inside the flipper that is currently on-screen. */
-    private TextView getCurrentTextView() {
+    protected TextView getCurrentTextView() {
         return (TextView) viewFlipper.getCurrentView();
     }
 
