@@ -149,7 +149,7 @@ public abstract class BaseClientActivity extends Activity {
 
         Log.d(LOG_TAG, "Application startup.");
 
-        setContentView(R.layout.activity_video_transfer);
+        setContentView(R.layout.usg_session_layout);
         setGesturesEnabled(true);
 
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);

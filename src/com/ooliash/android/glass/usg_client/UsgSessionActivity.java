@@ -31,7 +31,7 @@ import java.util.Locale;
 /**
  * Implementation of the main activity: transfers video and allows additional gestures.
  */
-public class UsgMainActivity extends BaseClientActivity {
+public class UsgSessionActivity extends BaseClientActivity {
 
     private static final String LOG_TAG = "USG";
     private int numberOfParams = 2;

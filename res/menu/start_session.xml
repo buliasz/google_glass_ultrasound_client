@@ -18,7 +18,7 @@
 
     <item
         android:id="@+id/new_session"
-        android:icon="@drawable/ic_usg_50"
+        android:icon="@drawable/ic_usg"
         android:title="@string/new_session"
         />
     <item

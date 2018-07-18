@@ -14,4 +14,6 @@
      limitations under the License.
 -->
 
-<trigger command="RUN_AN_EXPERIMENT" />
+<trigger keyword="USG client">
+    <constraints network="true" />
+</trigger>

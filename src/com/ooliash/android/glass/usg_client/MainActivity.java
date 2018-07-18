@@ -34,7 +34,7 @@ import android.view.MotionEvent;
  * The initial splash screen activity in the application that displays a "Start transfer" prompt and
  * allows the user to tap to access the instructions.
  */
-public class ApplicationMainActivity extends Activity {
+public class MainActivity extends Activity {
 
     /**
      * Handler used to post requests to start new activities so that the menu closing animation
@@ -66,7 +66,7 @@ public class ApplicationMainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_start_usg_maitenance);
+        setContentView(R.layout.start_usg_app_layout);
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mGestureDetector = new GestureDetector(this).setBaseListener(mBaseListener);
@@ -100,7 +100,7 @@ public class ApplicationMainActivity extends Activity {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        startVideoTransfer();
+                        startNewSession();
                     }
                 });
                 return true;
@@ -123,8 +123,8 @@ public class ApplicationMainActivity extends Activity {
      * Starts the main video transfer activity, and finishes this activity so that the user is not returned
      * to the splash screen when they exit.
      */
-    private void startVideoTransfer() {
-        startActivity(new Intent(this, UsgMainActivity.class));
+    private void startNewSession() {
+        startActivity(new Intent(this, UsgSessionActivity.class));
         finish();
     }
 

@@ -43,7 +43,7 @@ class UsgCommunicationTask extends AsyncTask<Void, String, Void> {
 
     // Other fields.
     private final WindowsSocketCommunication communication;
-    private final WeakReference<UsgMainActivity> contextWR;
+    private final WeakReference<UsgSessionActivity> contextWR;
 
     private ArrayBlockingQueue<String> commandQueue =
             new ArrayBlockingQueue<String>(COMMAND_QUEUE_CAPACITY);
@@ -51,8 +51,8 @@ class UsgCommunicationTask extends AsyncTask<Void, String, Void> {
     private Bitmap usgPicture;
     private String networkIndicatorText;
 
-    UsgCommunicationTask(UsgMainActivity context) {
-        contextWR = new WeakReference<UsgMainActivity>(context);
+    UsgCommunicationTask(UsgSessionActivity context) {
+        contextWR = new WeakReference<UsgSessionActivity>(context);
         communication = new WindowsSocketCommunication();
     }
 
@@ -150,7 +150,7 @@ class UsgCommunicationTask extends AsyncTask<Void, String, Void> {
             return;
         }
 
-        UsgMainActivity context = contextWR.get();
+        UsgSessionActivity context = contextWR.get();
         TextView currentTextView = context.getCurrentTextView();
         String command = progressData[0];
         if (command == COMMAND_GET_PICTURE) {

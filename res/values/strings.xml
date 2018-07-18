@@ -17,7 +17,7 @@
 <resources>
 
     <!-- The name of the application. -->
-    <string name="app_name">PJA USG client</string>
+    <string name="app_name">USG client</string>
 
     <!-- Tip text displayed at the bottom of the splash screen. -->
     <string name="tap_for_options">Tap for options</string>
