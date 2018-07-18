@@ -88,14 +88,6 @@ public class UsgMainActivity extends BaseClientActivity {
         mHandler.removeCallbacks(mTick);
     }
 
-    /**
-     * Overridden to select ten random phrases from the application's resources.
-     */
-    @Override
-    protected ClientModel createClientModel() {
-        return new ClientModel();
-    }
-
     @Override
     protected boolean handleGesture(Gesture gesture) {
         switch (gesture) {

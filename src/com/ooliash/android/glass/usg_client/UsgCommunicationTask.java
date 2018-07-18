@@ -39,7 +39,7 @@ class UsgCommunicationTask extends AsyncTask<Void, String, Void> {
     private static final String COMMAND_8BIT_GRAYSCALE = "8BIT_GRAYSCALE";
     
     // Local commands.
-    private static final String COMMAND_NETWORK_STATUS = "NETWORK_STATUS";
+//    private static final String COMMAND_NETWORK_STATUS = "NETWORK_STATUS";
 
     // Other fields.
     private final WindowsSocketCommunication communication;
@@ -131,17 +131,17 @@ class UsgCommunicationTask extends AsyncTask<Void, String, Void> {
         publishProgress(ERROR_MESSAGE, message); // clear command from main text
     }
 
-    private void networkIndicateDataPush() {
-        publishProgress(COMMAND_NETWORK_STATUS, "\u25b2"); // black up-pointing small triangle
-    }
-
-    private void networkIndicateDataPop() {
-        publishProgress(COMMAND_NETWORK_STATUS, "\u25bc"); // black down-pointing small triangle
-    }
-
-    private void networkIndicateNoDataTransfer() {
-        publishProgress(COMMAND_NETWORK_STATUS, " ");
-    }
+//    private void networkIndicateDataPush() {
+//        publishProgress(COMMAND_NETWORK_STATUS, "\u25b2"); // black up-pointing small triangle
+//    }
+//
+//    private void networkIndicateDataPop() {
+//        publishProgress(COMMAND_NETWORK_STATUS, "\u25bc"); // black down-pointing small triangle
+//    }
+//
+//    private void networkIndicateNoDataTransfer() {
+//        publishProgress(COMMAND_NETWORK_STATUS, " ");
+//    }
 
     @Override
     protected void onProgressUpdate(String... progressData) {
@@ -160,8 +160,8 @@ class UsgCommunicationTask extends AsyncTask<Void, String, Void> {
             currentTextView.setText(progressData[1]);
         } else if (command == ERROR_MESSAGE) {
             context.errorMessage(progressData[1]);
-        } else if (command == COMMAND_NETWORK_STATUS) {
-            context.networkIndicatorTextView.setText(progressData[1]);
+//        } else if (command == COMMAND_NETWORK_STATUS) {
+//            context.networkIndicatorTextView.setText(progressData[1]);
         } else if (command == COMMAND_GAIN_UP || command == COMMAND_GAIN_DOWN || command == COMMAND_GET_GAIN) {
             context.gainTextView.setText("\u2195" + progressData[1]);
             currentTextView.setText(""); // clear command from main text

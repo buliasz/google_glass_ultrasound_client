@@ -31,6 +31,9 @@
     <!-- Menu item text to start a new USG session. -->
     <string name="new_session">New USG session</string>
 
+    <!-- Menu item text for options menu. -->
+    <string name="options">Options</string>
+
     <!-- Menu item text to display the application instructions. -->
     <string name="instructions">Instructions</string>
 

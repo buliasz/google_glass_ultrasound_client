@@ -22,6 +22,11 @@
         android:title="@string/new_session"
         />
     <item
+        android:id="@+id/options"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/options"
+        />
+    <item
         android:id="@+id/instructions"
         android:icon="@drawable/ic_help_50"
         android:title="@string/instructions"

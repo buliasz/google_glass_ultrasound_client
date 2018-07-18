@@ -94,14 +94,14 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             />
 
-        <TextView
-            android:id="@+id/network_indicator"
-            android:layout_width="30px"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/tip_split_size"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textAlignment="viewEnd"
-            />
+        <!--<TextView-->
+            <!--android:id="@+id/network_indicator"-->
+            <!--android:layout_width="30px"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginLeft="@dimen/tip_split_size"-->
+            <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
+            <!--android:textAlignment="viewEnd"-->
+            <!--/>-->
 
     </LinearLayout>
 

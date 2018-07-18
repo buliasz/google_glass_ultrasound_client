@@ -99,11 +99,6 @@ public abstract class BaseClientActivity extends Activity {
     private GestureDetector gestureDetector;
 
     /**
-     * Model that stores the state of the application.
-     */
-    private ClientModel model;
-
-    /**
      * Value that can be updated to enable/disable gesture handling in the application. For example,
      * gestures are disabled briefly when a view is changed, so that the user cannot use gesture
      * again until the animation has completed.
@@ -123,7 +118,7 @@ public abstract class BaseClientActivity extends Activity {
     /**
      * TextView containing network transfer indicator.
      */
-    protected TextView networkIndicatorTextView;
+//    protected TextView networkIndicatorTextView;
 
     /**
      * Animation used to briefly tug a view when the user swipes left.
@@ -162,9 +157,9 @@ public abstract class BaseClientActivity extends Activity {
 
         viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
 
-        networkIndicatorTextView = (TextView) findViewById(R.id.network_indicator);
-        networkIndicatorTextView.setText(Character.toString(FULL_CIRCLE_CHARACTER));
-        networkIndicatorTextView.setTextColor(Color.DKGRAY);
+//        networkIndicatorTextView = (TextView) findViewById(R.id.network_indicator);
+//        networkIndicatorTextView.setText(Character.toString(FULL_CIRCLE_CHARACTER));
+//        networkIndicatorTextView.setTextColor(Color.DKGRAY);
         gainTextView = (TextView) findViewById(R.id.gain_value);
         areaTextView = (TextView) findViewById(R.id.area_value);
         batteryState = (TextView) findViewById(R.id.battery_state);
@@ -175,7 +170,6 @@ public abstract class BaseClientActivity extends Activity {
                 this.batteryInfoReceiver,
                 new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 
-        model = createClientModel();
         updateDisplay();
 //        Log.d(LOG_TAG, "Base client activity created");
     }
@@ -186,21 +180,10 @@ public abstract class BaseClientActivity extends Activity {
     }
 
     /**
-     * Subclasses must override this method to create and return the data model that will be used
-     * by the USG client.
-     */
-    protected abstract ClientModel createClientModel();
-
-    /**
      * Subclasses must override this method to handle {@link Gesture#TAP} and
      * {@link Gesture#SWIPE_RIGHT} gestures that occur during application.
      */
     protected abstract boolean handleGesture(Gesture gesture);
-
-    /** Returns the data model used by this instance of the client. */
-    protected ClientModel getClientModel() {
-        return model;
-    }
 
     /** Plays the sound effect of the specified type. */
     protected void playSoundEffect(int effectType) {
