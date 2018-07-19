@@ -66,6 +66,11 @@ public class UsgSessionActivity extends BaseActivity {
      * TextView that displays the current diagnosis time.
      */
     private TextView mTimer;
+    private UsgSessionMenuHandler menuHandler;
+
+    public UsgSessionActivity() {
+        menuHandler = new UsgSessionMenuHandler(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,25 +135,7 @@ public class UsgSessionActivity extends BaseActivity {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         if (featureId == WindowUtils.FEATURE_VOICE_COMMANDS
                 || featureId == Window.FEATURE_OPTIONS_PANEL) {
-            playSoundEffect(Sounds.TAP);
-            switch (item.getItemId()) {
-                case R.id.freeze:
-                    commandFreeze();
-                    break;
-                case R.id.save_picture:
-                    //TODO: Implement save picture.
-                    errorMessage("Not implemented yet.");
-                    break;
-                case R.id.options:
-                    //TODO: Implement options menu.
-                    errorMessage("Not implemented yet.");
-                    break;
-                case R.id.close_session:
-                    finish();
-                    break;
-                default:
-                    Log.e(LOG_TAG, "Unknown session menu item ID."); // + item.getTitle()
-            }
+            menuHandler.HandleItem(item.getItemId());
             return true;
         }
         return super.onMenuItemSelected(featureId, item);
@@ -158,7 +145,6 @@ public class UsgSessionActivity extends BaseActivity {
     protected boolean handleGesture(Gesture gesture) {
         switch (gesture) {
             case TAP:
-//                commandFreeze();
                 openOptionsMenu();
                 break;
             case SWIPE_LEFT:

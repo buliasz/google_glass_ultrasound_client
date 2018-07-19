@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/freeze"
+    <item android:id="@+id/freeze_option"
         android:title="@string/freeze"/>
-    <item android:id="@+id/save_picture"
+    <item android:id="@+id/save_picture_option"
         android:title="@string/save_picture"/>
-    <item android:id="@+id/options"
-        android:title="@string/options"/>
+    <item android:id="@+id/tx_signal_option"
+        android:title="@string/tx_signal"/>
+    <item android:id="@+id/palette_option"
+        android:title="@string/palette"/>
+    <item android:id="@+id/tgc_option"
+        android:title="@string/tgc"/>
     <item android:id="@+id/close_session"
         android:title="@string/close_session"/>
 </menu>

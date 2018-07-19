@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/sine1_25"
+        android:title="@string/sine_1_cycle_25_mhz"/>
+    <item android:id="@+id/sine4_25"
+        android:title="@string/sine_4_cycles_25_mhz"/>
+    <item android:id="@+id/sine6_25"
+        android:title="@string/sine_6_cycles_25_mhz"/>
+    <item android:id="@+id/sine16_25"
+        android:title="@string/sine_16_cycles_25_mhz"/>
+    <item android:id="@+id/bit13_20"
+        android:title="@string/_13_bit_barker_20_mhz"/>
+    <item android:id="@+id/bit13_35"
+        android:title="@string/_13_bit_barker_35_mhz"/>
+    <item android:id="@+id/bit16_chirp"
+        android:title="@string/_16_bit_chirp_15_25_mhz"/>
+</menu>

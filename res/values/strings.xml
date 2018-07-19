@@ -40,6 +40,22 @@
     <string name="save_picture">Save picture</string>
     <string name="close_session">Close session</string>
     <string name="exit">Exit</string>
+    <string name="gain">Gain</string>
+    <string name="tx_signal">TX Signal</string>
+    <string name="palette">Palette</string>
+    <string name="tgc">TGC</string>
+    <string name="_8_bit_linear_grayscale">8-bit linear grayscale</string>
+    <string name="_8_bit_log_1_5f_grayscale">8-bit log 1.5f grayscale</string>
+    <string name="_8_bit_log_1_75f_grayscale">8-bit log 1.75f grayscale</string>
+    <string name="_8_bit_log_2_0f_grayscale">8-bit log 2.0f grayscale</string>
+    <string name="_8_bit_log_3_0f_grayscale">8-bit log 3.0f grayscale</string>
+    <string name="sine_1_cycle_25_mhz">Sine 1 cycle, 25 MHz</string>
+    <string name="sine_4_cycles_25_mhz">Sine 4 cycles, 25 MHz</string>
+    <string name="sine_6_cycles_25_mhz">Sine 6 cycles, 25 MHz</string>
+    <string name="sine_16_cycles_25_mhz">Sine 16 cycles, 25 MHz</string>
+    <string name="_13_bit_barker_20_mhz">13-bit Barker, 20 MHz</string>
+    <string name="_13_bit_barker_35_mhz">13-bit Barker, 35 MHz</string>
+    <string name="_16_bit_chirp_15_25_mhz">16-bit Chirp, 15-25 Mhz</string>
 
     <!-- The tutorial instructions. -->
     <string-array name="tutorial_phrases">

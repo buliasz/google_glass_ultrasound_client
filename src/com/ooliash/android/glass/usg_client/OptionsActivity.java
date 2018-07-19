@@ -29,7 +29,7 @@ import com.google.android.glass.touchpad.Gesture;
 import java.util.Locale;
 
 /**
- * Implementation of the main activity: transfers video and allows additional gestures.
+ * Implementation of the options activity: allows additional options setting.
  */
 public class OptionsActivity extends BaseActivity {
 
@@ -40,48 +40,19 @@ public class OptionsActivity extends BaseActivity {
      */
     private final Handler mHandler = new Handler();
 
-    /**
-     * Runner that is called once per second during the transfer to show diagnosis time.
-     */
-    private final Runnable mTick = new Runnable() {
-        @Override
-        public void run() {
-            sessionTime += 1;
-            updateTimer();
-            nextTick();
-        }
-    };
-
-    /**
-     * Keeps track of number of seconds of diagnosis.
-     */
-    private int sessionTime;
-
-    /**
-     * TextView that displays the current diagnosis time.
-     */
-    private TextView mTimer;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mTimer = (TextView) findViewById(R.id.timer);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        sessionTime = 0;
-        updateTimer();
-        nextTick();
-        startConnectionToUsg();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        cancelUsgCommunicationTask();
-        mHandler.removeCallbacks(mTick);
     }
 
     @Override
@@ -112,20 +83,6 @@ public class OptionsActivity extends BaseActivity {
         return true;
     }
 
-    /** Enqueues the next timer tick into the message queue after one second. */
-    private void nextTick() {
-        mHandler.postDelayed(mTick, 1000);
-    }
-
-    /** Updates the timer display with the current number of seconds remaining. */
-    private void updateTimer() {
-        // The code point U+EE01 in Roboto is the vertically centered colon used in the clock on
-        // the Glass home screen.
-        String timeString = String.format(Locale.ENGLISH,
-            "%d\uee01%02d", sessionTime / 60, sessionTime % 60);
-        mTimer.setText(timeString);
-    }
-
     /**
      * Gesture callbacks.
      */
@@ -135,23 +92,18 @@ public class OptionsActivity extends BaseActivity {
 
     protected void onGestureSwipeLeft() {
         playSoundEffect(Sounds.TAP);
-//        updateDisplay();
-        permText("AREA UP");
     }
 
     protected void onGestureSwipeRight() {
         playSoundEffect(Sounds.TAP);
-        permText("AREA DOWN");
     }
 
     protected void onGestureSwipeUp() {
         playSoundEffect(Sounds.TAP);
-        permText("GAIN UP");
     }
 
     protected void onGestureSwipeDown() {
         playSoundEffect(Sounds.TAP);
-        permText("GAIN_DOWN");
     }
 
     private void permText(String text) {
@@ -160,19 +112,5 @@ public class OptionsActivity extends BaseActivity {
 
     void errorMessage(String text) {
         changeMainText(text, Color.RED, 16.5f, 2000);
-    }
-
-
-    protected void startConnectionToUsg() {
-        Log.d(LOG_TAG, "Starting communication task...");
-        changeMainText(
-                "Connecting to PJA USG...",
-                Color.RED,
-                26.5f,
-                0);
-    }
-
-    protected void cancelUsgCommunicationTask() {
-            Log.e(LOG_TAG, "I'm not connected to any USG.");
     }
 }
