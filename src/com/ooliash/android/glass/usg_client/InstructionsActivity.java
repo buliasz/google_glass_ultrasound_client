@@ -16,26 +16,25 @@
 
 package com.ooliash.android.glass.usg_client;
 
-import com.google.android.glass.media.Sounds;
-import com.google.android.glass.touchpad.Gesture;
-import com.google.android.glass.view.WindowUtils;
-
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.WindowManager;
 import android.widget.TextView;
+
+import com.google.android.glass.media.Sounds;
+import com.google.android.glass.touchpad.Gesture;
 
 import java.util.Locale;
 
 /**
  * Implementation of the main activity: transfers video and allows additional gestures.
  */
-public class UsgSessionActivity extends BaseActivity {
+public class InstructionsActivity extends BaseActivity {
 
     private static final String LOG_TAG = "USG";
-    private UsgCommunicationTask usgCommunicationTask;
+    private int numberOfParams = 2;
+    private int highlightedParam = 0;
 
     /**
      * Handler used to keep the timer ticking once per second.
@@ -67,11 +66,6 @@ public class UsgSessionActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().addFlags(WindowUtils.FEATURE_VOICE_COMMANDS);
-
-        usgCommunicationTask = new UsgCommunicationTask(this);
         mTimer = (TextView) findViewById(R.id.timer);
     }
 
@@ -111,7 +105,7 @@ public class UsgSessionActivity extends BaseActivity {
                 break;
             case TWO_LONG_PRESS:
                 permText("EXITING...");
-                finish();
+                this.finish();
                 break;
             default:
                 return false;
@@ -137,33 +131,36 @@ public class UsgSessionActivity extends BaseActivity {
      * Gesture callbacks.
      */
     protected void onGestureTap() {
-        usgCommunicationTask.SendCommand("FREEZE");
         permText("FREEZE");
     }
 
     protected void onGestureSwipeLeft() {
         playSoundEffect(Sounds.TAP);
-        usgCommunicationTask.SendCommand("AREA_UP");
 //        updateDisplay();
         permText("AREA UP");
     }
 
+    private void highlightPrevoiusParam() {
+        highlightedParam = highlightedParam > 0 ? highlightedParam - 1 : numberOfParams - 1;
+    }
+
     protected void onGestureSwipeRight() {
         playSoundEffect(Sounds.TAP);
-        usgCommunicationTask.SendCommand("AREA_DOWN");
         permText("AREA DOWN");
+    }
+
+    private void highlightNextParam() {
+        highlightedParam = (highlightedParam + 1) % numberOfParams;
     }
 
     protected void onGestureSwipeUp() {
         playSoundEffect(Sounds.TAP);
         permText("GAIN UP");
-        usgCommunicationTask.SendCommand("GAIN_UP");
     }
 
     protected void onGestureSwipeDown() {
         playSoundEffect(Sounds.TAP);
         permText("GAIN_DOWN");
-        usgCommunicationTask.SendCommand("GAIN_DOWN");
     }
 
     private void permText(String text) {
@@ -174,19 +171,17 @@ public class UsgSessionActivity extends BaseActivity {
         changeMainText(text, Color.RED, 16.5f, 2000);
     }
 
+
     protected void startConnectionToUsg() {
         Log.d(LOG_TAG, "Starting communication task...");
-        permText("Connecting to PJA USG...");
-        usgCommunicationTask.execute();
+        changeMainText(
+                "Connecting to PJA USG...",
+                Color.RED,
+                26.5f,
+                0);
     }
 
     protected void cancelUsgCommunicationTask() {
-        if (!usgCommunicationTask.isCancelled()) {
-            permText("Disconnecting from PJA USG...");
-            usgCommunicationTask.cancel(true);
-            changeMainText("Disconnected", Color.GREEN, 26.5f, 1000);
-        } else {
             Log.e(LOG_TAG, "I'm not connected to any USG.");
-        }
     }
 }

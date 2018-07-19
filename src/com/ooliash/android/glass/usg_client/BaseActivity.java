@@ -45,7 +45,7 @@ import android.widget.ViewFlipper;
  * of the screen and animations between pages. It is up to subclasses to provide the data model and
  * map gestures to the appropriate logic.
  */
-public abstract class BaseClientActivity extends Activity {
+public abstract class BaseActivity extends Activity {
 
     /**
      * The amount of time to leave the previous view on screen before advancing.
@@ -115,9 +115,9 @@ public abstract class BaseClientActivity extends Activity {
      */
     private TextView batteryState;
 
-    /**
-     * TextView containing network transfer indicator.
-     */
+//    /**
+//     * TextView containing network transfer indicator.
+//     */
 //    protected TextView networkIndicatorTextView;
 
     /**

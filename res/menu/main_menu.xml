@@ -19,17 +19,18 @@
     <item
         android:id="@+id/new_session"
         android:icon="@drawable/ic_usg"
-        android:title="@string/new_session"
-        />
+        android:title="@string/new_session"/>
     <item
         android:id="@+id/options"
         android:icon="@drawable/ic_settings"
-        android:title="@string/options"
-        />
+        android:title="@string/options"/>
     <item
         android:id="@+id/instructions"
         android:icon="@drawable/ic_help_50"
-        android:title="@string/instructions"
-        />
+        android:title="@string/instructions"/>
+    <item
+        android:id="@+id/exit"
+        android:icon="@drawable/ic_stop"
+        android:title="@string/exit"/>
 
 </menu>

@@ -19,6 +19,7 @@ package com.ooliash.android.glass.usg_client;
 import com.google.android.glass.media.Sounds;
 import com.google.android.glass.touchpad.Gesture;
 import com.google.android.glass.touchpad.GestureDetector;
+import com.google.android.glass.view.WindowUtils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -26,15 +27,20 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.Window;
+import android.view.WindowManager;
 
 /**
  * The initial splash screen activity in the application that displays a "Start transfer" prompt and
  * allows the user to tap to access the instructions.
  */
 public class MainActivity extends Activity {
+
+    private static final String LOG_TAG = "USG";
 
     /**
      * Handler used to post requests to start new activities so that the menu closing animation
@@ -50,9 +56,8 @@ public class MainActivity extends Activity {
                 mAudioManager.playSoundEffect(Sounds.TAP);
                 openOptionsMenu();
                 return true;
-            } else {
-                return false;
             }
+            return false;
         }
     };
 
@@ -66,10 +71,13 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.start_usg_app_layout);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().requestFeature(WindowUtils.FEATURE_VOICE_COMMANDS);
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mGestureDetector = new GestureDetector(this).setBaseListener(mBaseListener);
+
+        setContentView(R.layout.start_usg_app_layout);
     }
 
     @Override
@@ -78,45 +86,69 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.start_session, menu);
-        return true;
+    public boolean onCreatePanelMenu(int featureId, Menu menu) {
+        if (featureId == WindowUtils.FEATURE_VOICE_COMMANDS || featureId == Window.FEATURE_OPTIONS_PANEL) {
+            getMenuInflater().inflate(R.menu.main_menu, menu);
+            return true;
+        }
+        return super.onCreatePanelMenu(featureId, menu);
     }
 
     /**
-     * The act of starting an activity here is wrapped inside a posted {@code Runnable} to avoid
-     * animation problems between the closing menu and the new activity. The post ensures that the
-     * menu gets the chance to slide down off the screen before the activity is started.
+     * Implementation of {@link Window.Callback#onMenuItemSelected} for activities.  This calls
+     * through to the new {@link #onOptionsItemSelected} method for the
+     * {@link Window#FEATURE_OPTIONS_PANEL} panel, so that subclasses of Activity don't need to deal
+     * with feature codes.
+     *
+     * @param featureId ID of the feature calling this method.
+     * @param item  Item selected.
      */
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // The startXXX() methods start a new activity, and if we call them directly here then
-        // the new activity will start without giving the menu a chance to slide back down first.
-        // By posting the calls to a handler instead, they will be processed on an upcoming onGestureSwipeRight
-        // through the message queue, after the animation has completed, which results in a
-        // smoother transition between activities.
-        switch (item.getItemId()) {
-            case R.id.new_session:
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        startNewSession();
-                    }
-                });
-                return true;
-
-            case R.id.instructions:
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        startTutorial();
-                    }
-                });
-                return true;
-
-            default:
-                return false;
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        if (featureId == WindowUtils.FEATURE_VOICE_COMMANDS || featureId == Window.FEATURE_OPTIONS_PANEL) {
+            switch (item.getItemId()) {
+                /*
+                 * The act of starting an activity here is wrapped inside a posted {@code Runnable} to avoid
+                 * animation problems between the closing menu and the new activity. The post ensures that the
+                 * menu gets the chance to slide down off the screen before the activity is started.
+                 * The startXXX() methods start a new activity, and if we call them directly here then
+                 * the new activity will start without giving the menu a chance to slide back down first.
+                 * By posting the calls to a handler instead, they will be processed on an upcoming onGestureSwipeRight
+                 * through the message queue, after the animation has completed, which results in a
+                 * smoother transition between activities.
+                 */
+                case R.id.new_session:
+                    Log.d(LOG_TAG, "Voice: New session");
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            startNewSession();
+                        }
+                    });
+                    return true;
+                case R.id.options:
+                    Log.d(LOG_TAG, "Voice: Options");
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            startOptions();
+                        }
+                    });
+                    return true;
+                case R.id.instructions:
+                    Log.d(LOG_TAG, "Voice: Instructions");
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            startInstructions();
+                        }
+                    });
+                    return true;
+            }
+            Log.e(LOG_TAG, "Voice: NO CASE");
         }
+        Log.d(LOG_TAG, "No voice");
+        return super.onMenuItemSelected(featureId, item);
     }
 
     /**
@@ -125,14 +157,20 @@ public class MainActivity extends Activity {
      */
     private void startNewSession() {
         startActivity(new Intent(this, UsgSessionActivity.class));
-        finish();
+    }
+
+    /**
+     * Starts the additional options configuration.
+     */
+    private void startOptions() {
+        startActivity(new Intent(this, OptionsActivity.class));
     }
 
     /**
      * Starts the tutorial activity, but does not finish this activity so that the splash screen
      * reappears when the tutorial is over.
      */
-    private void startTutorial() {
-        startActivity(new Intent(this, TutorialActivity.class));
+    private void startInstructions() {
+        startActivity(new Intent(this, InstructionsActivity.class));
     }
 }

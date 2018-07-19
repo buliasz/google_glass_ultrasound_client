@@ -15,6 +15,7 @@
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.ooliash.android.glass.usg_client"
     android:versionCode="1"
     android:versionName="1.0"
@@ -23,7 +24,7 @@
     <uses-sdk
         android:minSdkVersion="19"
         android:targetSdkVersion="19"
-        />
+        tools:ignore="OldTargetApi" />
 
     <uses-permission android:name="com.google.android.glass.permission.DEVELOPMENT" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -39,6 +40,7 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="com.google.android.glass.action.VOICE_TRIGGER" />
+                <action android:name="android.intent.action.VIEW" />
             </intent-filter>
             <meta-data
                 android:name="com.google.android.glass.VoiceTrigger"
@@ -47,6 +49,8 @@
         </activity>
         <activity android:name=".UsgSessionActivity" />
         <activity android:name=".TutorialActivity" />
+        <activity android:name=".InstructionsActivity" />
+        <activity android:name=".OptionsActivity" />
     </application>
 
 </manifest>

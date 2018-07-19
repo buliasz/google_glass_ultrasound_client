@@ -36,6 +36,10 @@
 
     <!-- Menu item text to display the application instructions. -->
     <string name="instructions">Instructions</string>
+    <string name="freeze">Freeze</string>
+    <string name="save_picture">Save picture</string>
+    <string name="close_session">Close session</string>
+    <string name="exit">Exit</string>
 
     <!-- The tutorial instructions. -->
     <string-array name="tutorial_phrases">
