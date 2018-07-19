@@ -23,20 +23,20 @@ class UsgCommunicationTask extends AsyncTask<Void, String, Void> {
     private static final String ERROR_MESSAGE = "ERROR_MESSAGE";
 
     // Available USG server commands.
-    private static final String COMMAND_GET_PICTURE = "GET_PICTURE";
-    private static final String COMMAND_GET_GAIN = "GET_GAIN";
-    private static final String COMMAND_GET_AREA = "GET_IMAGING_RANGE";
-    private static final String COMMAND_GET_TX_FREQUENCY = "GET_TX_FREQUENCY";
-    private static final String COMMAND_GET_TX_TYPE = "GET_TX_TYPE";
-    private static final String COMMAND_GET_FPS = "GET_FPS";
-    private static final String COMMAND_FREEZE = "FREEZE";
-    private static final String COMMAND_GAIN_UP = "GAIN_UP";
-    private static final String COMMAND_GAIN_DOWN = "GAIN_DOWN";
-    private static final String COMMAND_AREA_UP = "AREA_UP";
-    private static final String COMMAND_AREA_DOWN = "AREA_DOWN";
-    private static final String COMMAND_HIDE = "HIDE";
-    private static final String COMMAND_SAVE = "SAVE";
-    private static final String COMMAND_8BIT_GRAYSCALE = "8BIT_GRAYSCALE";
+    static final String COMMAND_GET_PICTURE = "GET_PICTURE";
+    static final String COMMAND_GET_GAIN = "GET_GAIN";
+    static final String COMMAND_GET_AREA = "GET_IMAGING_RANGE";
+    static final String COMMAND_GET_TX_FREQUENCY = "GET_TX_FREQUENCY";
+    static final String COMMAND_GET_TX_TYPE = "GET_TX_TYPE";
+    static final String COMMAND_GET_FPS = "GET_FPS";
+    static final String COMMAND_FREEZE = "FREEZE";
+    static final String COMMAND_GAIN_UP = "GAIN_UP";
+    static final String COMMAND_GAIN_DOWN = "GAIN_DOWN";
+    static final String COMMAND_AREA_UP = "AREA_UP";
+    static final String COMMAND_AREA_DOWN = "AREA_DOWN";
+    static final String COMMAND_HIDE = "HIDE";
+    static final String COMMAND_SAVE = "SAVE";
+    static final String COMMAND_8BIT_GRAYSCALE = "8BIT_GRAYSCALE";
     
     // Local commands.
 //    private static final String COMMAND_NETWORK_STATUS = "NETWORK_STATUS";
@@ -45,24 +45,20 @@ class UsgCommunicationTask extends AsyncTask<Void, String, Void> {
     private final WindowsSocketCommunication communication;
     private final WeakReference<UsgSessionActivity> contextWR;
 
-    private ArrayBlockingQueue<String> commandQueue =
+    ArrayBlockingQueue<String> commandQueue =
             new ArrayBlockingQueue<String>(COMMAND_QUEUE_CAPACITY);
 
     private Bitmap usgPicture;
-    private String networkIndicatorText;
+    private boolean isConnected;
+//    private String networkIndicatorText;
 
     UsgCommunicationTask(UsgSessionActivity context) {
         contextWR = new WeakReference<UsgSessionActivity>(context);
         communication = new WindowsSocketCommunication();
     }
 
-    void SendCommand(String command) {
-        try {
-            commandQueue.put(command);
-        } catch (InterruptedException e) {
-            Log.e(LOG_TAG, "Cannot put new command to the command queue: "
-                    + e.getMessage());
-        }
+    boolean isConnected() {
+        return isConnected;
     }
 
     /**
@@ -81,6 +77,7 @@ class UsgCommunicationTask extends AsyncTask<Void, String, Void> {
         while (!isCancelled()) {
             try {
                 communication.connectToUsgServer();
+                isConnected = true;
                 publishProgress(SET_MAIN_TEXT, ""); // clear command from main text
                 Log.d(LOG_TAG, "connected...");
                 commandQueue.add(COMMAND_GET_GAIN);
@@ -91,7 +88,6 @@ class UsgCommunicationTask extends AsyncTask<Void, String, Void> {
                     String command = commandQueue.poll();
                     if (command == null) {
                         command = COMMAND_GET_PICTURE;  // Send pull picture command if queue is empty.
-                    } else {
                     }
                     Log.d(LOG_TAG, "Sending " + command + " command");
                     communication.SendString(command);
@@ -151,23 +147,22 @@ class UsgCommunicationTask extends AsyncTask<Void, String, Void> {
         }
 
         UsgSessionActivity context = contextWR.get();
-        TextView currentTextView = context.getCurrentTextView();
         String command = progressData[0];
         if (command == COMMAND_GET_PICTURE) {
             BitmapDrawable drawable = new BitmapDrawable(Resources.getSystem(), usgPicture);
-            currentTextView.setBackground(drawable);
+            context.textView.setBackground(drawable);
         } else if (command == SET_MAIN_TEXT) {
-            currentTextView.setText(progressData[1]);
+            context.textView.setText(progressData[1]);
         } else if (command == ERROR_MESSAGE) {
             context.errorMessage(progressData[1]);
 //        } else if (command == COMMAND_NETWORK_STATUS) {
 //            context.networkIndicatorTextView.setText(progressData[1]);
         } else if (command == COMMAND_GAIN_UP || command == COMMAND_GAIN_DOWN || command == COMMAND_GET_GAIN) {
             context.gainTextView.setText("\u2195" + progressData[1]);
-            currentTextView.setText(""); // clear command from main text
+            context.textView.setText(""); // clear command from main text
         } else if (command == COMMAND_AREA_UP || command == COMMAND_AREA_DOWN || command == COMMAND_GET_AREA) {
             context.areaTextView.setText("\u2194" + progressData[1]);
-            currentTextView.setText(""); // clear command from main text
+            context.textView.setText(""); // clear command from main text
         } else {
             Log.e(LOG_TAG, "Unknown command for onProgressUpdate(): " + command);
         }

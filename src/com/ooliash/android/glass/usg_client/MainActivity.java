@@ -71,7 +71,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().requestFeature(WindowUtils.FEATURE_VOICE_COMMANDS);
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -143,6 +142,10 @@ public class MainActivity extends Activity {
                             startInstructions();
                         }
                     });
+                    return true;
+                case R.id.exit:
+                    Log.d(LOG_TAG, "Voice: Exit");
+                    finish();
                     return true;
             }
             Log.e(LOG_TAG, "Voice: NO CASE");

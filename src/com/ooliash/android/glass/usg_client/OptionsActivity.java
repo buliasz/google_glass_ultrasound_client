@@ -34,8 +34,6 @@ import java.util.Locale;
 public class OptionsActivity extends BaseActivity {
 
     private static final String LOG_TAG = "USG";
-    private int numberOfParams = 2;
-    private int highlightedParam = 0;
 
     /**
      * Handler used to keep the timer ticking once per second.
@@ -141,17 +139,9 @@ public class OptionsActivity extends BaseActivity {
         permText("AREA UP");
     }
 
-    private void highlightPrevoiusParam() {
-        highlightedParam = highlightedParam > 0 ? highlightedParam - 1 : numberOfParams - 1;
-    }
-
     protected void onGestureSwipeRight() {
         playSoundEffect(Sounds.TAP);
         permText("AREA DOWN");
-    }
-
-    private void highlightNextParam() {
-        highlightedParam = (highlightedParam + 1) % numberOfParams;
     }
 
     protected void onGestureSwipeUp() {

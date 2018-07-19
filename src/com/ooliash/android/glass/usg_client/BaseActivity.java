@@ -16,9 +16,6 @@
 
 package com.ooliash.android.glass.usg_client;
 
-import com.google.android.glass.touchpad.Gesture;
-import com.google.android.glass.touchpad.GestureDetector;
-
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -34,10 +31,10 @@ import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.TextView;
-import android.widget.ViewFlipper;
+
+import com.google.android.glass.touchpad.Gesture;
+import com.google.android.glass.touchpad.GestureDetector;
 
 /**
  * An abstract implementation of the USG-client's user interface. This handles functionality shared
@@ -46,22 +43,11 @@ import android.widget.ViewFlipper;
  * map gestures to the appropriate logic.
  */
 public abstract class BaseActivity extends Activity {
-
-    /**
-     * The amount of time to leave the previous view on screen before advancing.
-     */
-    private static final long PAGE_CHANGE_DELAY_MILLIS = 500;
-
     /**
      * The Unicode character for the filled parallelogram, representing charged battery part.
      * Not working on Glass
      */
     private static final char BATTERY_FILLED_PART_CHARACTER = '\u25a0';
-
-    /**
-     * Full circle character used for network indicator.
-     */
-    private static final char FULL_CIRCLE_CHARACTER = '\u25cf';
 
     /**
      * The Unicode character for the empty parallelogram, representing empty battery part.
@@ -84,7 +70,7 @@ public abstract class BaseActivity extends Activity {
     private final GestureDetector.BaseListener mBaseListener = new GestureDetector.BaseListener() {
         @Override
         public boolean onGesture(Gesture gesture) {
-            return areGesturesEnabled() && handleGesture(gesture);
+            return handleGesture(gesture);
         }
     };
 
@@ -99,39 +85,16 @@ public abstract class BaseActivity extends Activity {
     private GestureDetector gestureDetector;
 
     /**
-     * Value that can be updated to enable/disable gesture handling in the application. For example,
-     * gestures are disabled briefly when a view is changed, so that the user cannot use gesture
-     * again until the animation has completed.
-     */
-    private boolean gesturesEnabled;
-
-    /**
-     * View flipper with two views used to provide the flinging animations between views.
-     */
-    private ViewFlipper viewFlipper;
-
-    /**
      * TextView containing the bars that represent the battery state.
      */
     private TextView batteryState;
 
-//    /**
-//     * TextView containing network transfer indicator.
-//     */
-//    protected TextView networkIndicatorTextView;
-
-    /**
-     * Animation used to briefly tug a view when the user swipes left.
-     */
-    private Animation tugRightAnimation;
-    private boolean isConnected = false;
     int batteryLevel = 0;
 
     private BroadcastReceiver batteryInfoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-//            Log.d(LOG_TAG, "BATTERY LEVEL: " + batteryLevel);
             batteryState.setText(buildBatteryBar());
         }
     };
@@ -139,7 +102,7 @@ public abstract class BaseActivity extends Activity {
     /**
      * Current TextView.
      */
-    private TextView textView;
+    TextView textView;
     protected TextView gainTextView;
     protected TextView areaTextView;
 
@@ -150,28 +113,19 @@ public abstract class BaseActivity extends Activity {
         Log.d(LOG_TAG, "Application startup.");
 
         setContentView(R.layout.usg_session_layout);
-        setGesturesEnabled(true);
 
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         gestureDetector = new GestureDetector(this).setBaseListener(mBaseListener);
 
-        viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
+        textView = (TextView) findViewById(R.id.session_main_view);
 
-//        networkIndicatorTextView = (TextView) findViewById(R.id.network_indicator);
-//        networkIndicatorTextView.setText(Character.toString(FULL_CIRCLE_CHARACTER));
-//        networkIndicatorTextView.setTextColor(Color.DKGRAY);
         gainTextView = (TextView) findViewById(R.id.gain_value);
         areaTextView = (TextView) findViewById(R.id.area_value);
         batteryState = (TextView) findViewById(R.id.battery_state);
 
-        tugRightAnimation = AnimationUtils.loadAnimation(this, R.anim.tug_right);
-
         this.registerReceiver(
                 this.batteryInfoReceiver,
                 new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-
-        updateDisplay();
-//        Log.d(LOG_TAG, "Base client activity created");
     }
 
     @Override
@@ -191,32 +145,12 @@ public abstract class BaseActivity extends Activity {
     }
 
     /**
-     * This method flings the parameters page into view.
-     */
-    protected void goToParameters() {
-        // Disable gesture handling so that the user can't tap or swipe during the animation.
-        setGesturesEnabled(false);
-
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                viewFlipper.showNext();
-                updateDisplay();
-
-                // Re-enable gesture handling after the delay has passed.
-                setGesturesEnabled(true);
-            }
-        }, PAGE_CHANGE_DELAY_MILLIS);
-    }
-
-    /**
      * Change main TextView text.
      * @param text The new text to display.
      * @param color Text color.
      * @param size Text size.
      */
     protected void changeMainText(String text, int color, float size, long delayMilis) {
-        textView = getCurrentTextView();
         textView.setText(text);
         textView.setTextSize(size);
         textView.setTextColor(color);
@@ -235,13 +169,6 @@ public abstract class BaseActivity extends Activity {
         super.onStop();
         this.unregisterReceiver(this.batteryInfoReceiver);
     }
-
-    /**
-     * Updates the display state.
-     */
-    private void updateDisplay() {
-    }
-
 
     /**
      * Builds and returns a spanned string containing colorized battery level status.
@@ -269,29 +196,5 @@ public abstract class BaseActivity extends Activity {
             }
         }
         return builder;
-    }
-
-    /** Returns the {@code TextView} inside the flipper that is currently on-screen. */
-    protected TextView getCurrentTextView() {
-        return (TextView) viewFlipper.getCurrentView();
-    }
-
-    /** Returns true if gestures should be processed or false if they should be ignored. */
-    private boolean areGesturesEnabled() {
-        return gesturesEnabled;
-    }
-
-    /**
-     * Enables gesture handling if {@code enabled} is true, otherwise disables gesture handling.
-     * Gestures are temporarily disabled when a freeze is enabled so that extraneous taps and
-     * swipes are ignored during freeze.
-     */
-    private void setGesturesEnabled(boolean enabled) {
-        gesturesEnabled = enabled;
-    }
-
-    /** Plays a tugging animation that provides feedback when the user tries to swipe backward. */
-    private void tugSwipe() {
-        viewFlipper.startAnimation(tugRightAnimation);
     }
 }

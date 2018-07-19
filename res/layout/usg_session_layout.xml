@@ -20,61 +20,37 @@
     android:keepScreenOn="true"
     >
 
-    <ViewFlipper
-        android:id="@+id/view_flipper"
+    <TextView
+        android:id="@+id/session_main_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:inAnimation="@anim/slide_in_right"
-        android:outAnimation="@anim/slide_out_left"
-        >
-
-        <TextView
-            android:id="@+id/phrase_primary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="@dimen/card_margin"
-            android:layout_marginRight="@dimen/card_margin"
-            android:gravity="center"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            />
-
-        <TextView
-            android:id="@+id/phrase_secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="@dimen/card_margin"
-            android:layout_marginRight="@dimen/card_margin"
-            android:gravity="center"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            />
-
-    </ViewFlipper>
+        android:layout_gravity="center"
+        android:layout_marginLeft="0px"
+        android:layout_marginRight="0px"
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        />
 
     <LinearLayout
         android:id="@+id/status_bar"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="@dimen/tip_margin_top"
-        android:layout_marginRight="@dimen/tip_margin_right"
         >
 
         <TextView
             android:id="@+id/gain_value"
-            android:layout_width="90px"
+            android:layout_width="60pt"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/tip_split_size"
+            android:layout_marginStart="0px"
             android:textAppearance="?android:attr/textAppearanceSmall"
             />
 
         <TextView
             android:id="@+id/area_value"
-            android:layout_width="190px"
+            android:layout_width="120pt"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/tip_split_size"
+            android:layout_marginStart="@dimen/tip_split_size"
             android:textAppearance="?android:attr/textAppearanceSmall"
             />
 
@@ -82,26 +58,17 @@
             android:id="@+id/battery_state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/tip_split_size"
+            android:layout_marginStart="@dimen/tip_split_size"
             android:textAppearance="?android:attr/textAppearanceSmall"
             />
 
         <TextView
             android:id="@+id/timer"
-            android:layout_width="wrap_content"
+            android:layout_width="40pt"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/tip_split_size"
+            android:layout_marginStart="@dimen/tip_split_size"
             android:textAppearance="?android:attr/textAppearanceSmall"
             />
-
-        <!--<TextView-->
-            <!--android:id="@+id/network_indicator"-->
-            <!--android:layout_width="30px"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginLeft="@dimen/tip_split_size"-->
-            <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
-            <!--android:textAlignment="viewEnd"-->
-            <!--/>-->
 
     </LinearLayout>
 
