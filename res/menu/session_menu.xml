@@ -5,11 +5,39 @@
     <item android:id="@+id/save_picture_option"
         android:title="@string/save_picture"/>
     <item android:id="@+id/tx_signal_option"
-        android:title="@string/tx_signal"/>
+        android:title="@string/tx_signal">
+        <menu>
+            <item android:id="@+id/sine1_25"
+                android:title="@string/sine_1_cycle_25_mhz"/>
+            <item android:id="@+id/sine4_25"
+                android:title="@string/sine_4_cycles_25_mhz"/>
+            <item android:id="@+id/sine6_25"
+                android:title="@string/sine_6_cycles_25_mhz"/>
+            <item android:id="@+id/sine16_25"
+                android:title="@string/sine_16_cycles_25_mhz"/>
+            <item android:id="@+id/bit13_20"
+                android:title="@string/_13_bit_barker_20_mhz"/>
+            <item android:id="@+id/bit13_35"
+                android:title="@string/_13_bit_barker_35_mhz"/>
+            <item android:id="@+id/bit16_chirp"
+                android:title="@string/_16_bit_chirp_15_25_mhz"/>
+        </menu>
+    </item>
     <item android:id="@+id/palette_option"
-        android:title="@string/palette"/>
-    <item android:id="@+id/tgc_option"
-        android:title="@string/tgc"/>
+        android:title="@string/palette">
+        <menu>
+            <item android:id="@+id/linear"
+                android:title="@string/_8_bit_linear_grayscale"/>
+            <item android:id="@+id/log1_5"
+                android:title="@string/_8_bit_log_1_5f_grayscale"/>
+            <item android:id="@+id/log1_75"
+                android:title="@string/_8_bit_log_1_75f_grayscale"/>
+            <item android:id="@+id/log2_0"
+                android:title="@string/_8_bit_log_2_0f_grayscale"/>
+            <item android:id="@+id/log3_0"
+                android:title="@string/_8_bit_log_3_0f_grayscale"/>
+        </menu>
+    </item>
     <item android:id="@+id/close_session"
         android:title="@string/close_session"/>
 </menu>

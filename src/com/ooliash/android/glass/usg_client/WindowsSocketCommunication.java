@@ -5,6 +5,8 @@ import android.graphics.BitmapFactory;
 import android.os.StrictMode;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
@@ -14,25 +16,30 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 
 public class WindowsSocketCommunication {
     // Constants.
     private static final String LOG_TAG = "USG";
     private static final int PORT_NUMBER = 9050;
     private static final int BROADCAST_PORT_NUMBER = 9049;
-    private static final int SOCKET_TIMEOUT = 3000;
-    private static final int BUFFER_SIZE = 128*1024;
+    private static final int SOCKET_TIMEOUT = 4000;
+    private static final int PICTURE_BUFFER_SIZE = 128*1024;
+    private static final int STRING_BUFFER_SIZE = 512;
 
     // Data transfer variables.
     private static byte[] intBuffer = new byte[4];
-    private static byte[] dataBuffer = new byte[BUFFER_SIZE];
+    private static byte[] pictureDataBuffer = new byte[PICTURE_BUFFER_SIZE];
+    private static byte[] stringDataBuffer = new byte[STRING_BUFFER_SIZE];
     private Socket socket;
 
     // Other variables.
     private InetAddress serverAddress;   // "192.168.1.100"
     private InputStream inputStream;
     private OutputStream outputStream;
+    private int lastPictureBytesLength = 0;
 
     /**
      * Connects to USG server. Restarts connection if it's already connected.
@@ -107,8 +114,8 @@ public class WindowsSocketCommunication {
      * @throws IOException
      */
     String ReceiveString() throws IOException {
-        int length = ReceiveByteArray();
-        return new String(dataBuffer, 0, length);
+        int length = ReceiveByteArray(stringDataBuffer);
+        return new String(stringDataBuffer, 0, length);
     }
 
     /**
@@ -117,9 +124,9 @@ public class WindowsSocketCommunication {
      * @throws IOException
      */
     Bitmap ReceiveBitmap() throws IOException {
-        int length = ReceiveByteArray();
+        lastPictureBytesLength = ReceiveByteArray(pictureDataBuffer);
 //        Log.d(LOG_TAG, "Received " + length + " bytes.");
-        return BitmapFactory.decodeByteArray(dataBuffer, 0, length);
+        return BitmapFactory.decodeByteArray(pictureDataBuffer, 0, lastPictureBytesLength);
     }
 
     /*
@@ -201,7 +208,7 @@ public class WindowsSocketCommunication {
      * @return The byte array received.
      * @throws IOException
      */
-    private int ReceiveByteArray() throws IOException {
+    private int ReceiveByteArray(byte[] byteArray) throws IOException {
 //        networkIndicateDataPop();
 //        logd("receiving data length...");
         int length = ReceiveInt();
@@ -210,7 +217,7 @@ public class WindowsSocketCommunication {
             throw new UsgCommandExecutionException(ReceiveString());
         }
 
-        if (length < 0 || length > BUFFER_SIZE) {
+        if (length < 0 || length > PICTURE_BUFFER_SIZE) {
             Log.e(LOG_TAG, "data length (" + length + ") out of bounds.");
             throw new IndexOutOfBoundsException("Length: " + length);
         }
@@ -218,7 +225,7 @@ public class WindowsSocketCommunication {
 //        Log.d(LOG_TAG, "Receiving " + length + " bytes...");
         int received = 0;
         while (received < length) {
-            received += inputStream.read(dataBuffer, received, length - received);
+            received += inputStream.read(byteArray, received, length - received);
 //            logd("Received " + received + "/" + length);
         }
 //        networkIndicateNoDataTransfer();
@@ -256,5 +263,9 @@ public class WindowsSocketCommunication {
         byteArray[2] = (byte)((inputInt >> 16) & 0xFF);
         byteArray[3] = (byte)((inputInt >> 24) & 0xFF);
         return byteArray;
+    }
+
+    public byte[] getLastPictureBytes() {
+        return Arrays.copyOf(pictureDataBuffer, lastPictureBytesLength);
     }
 }

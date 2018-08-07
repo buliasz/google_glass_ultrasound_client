@@ -125,15 +125,6 @@ public class MainActivity extends Activity {
                         }
                     });
                     return true;
-                case R.id.options:
-                    Log.d(LOG_TAG, "Voice: Options");
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            startOptions();
-                        }
-                    });
-                    return true;
                 case R.id.instructions:
                     Log.d(LOG_TAG, "Voice: Instructions");
                     mHandler.post(new Runnable() {
@@ -160,13 +151,6 @@ public class MainActivity extends Activity {
      */
     private void startNewSession() {
         startActivity(new Intent(this, UsgSessionActivity.class));
-    }
-
-    /**
-     * Starts the additional options configuration.
-     */
-    private void startOptions() {
-        startActivity(new Intent(this, OptionsActivity.class));
     }
 
     /**

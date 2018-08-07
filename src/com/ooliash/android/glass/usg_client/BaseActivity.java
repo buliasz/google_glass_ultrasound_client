@@ -144,26 +144,6 @@ public abstract class BaseActivity extends Activity {
         audioManager.playSoundEffect(effectType);
     }
 
-    /**
-     * Change main TextView text.
-     * @param text The new text to display.
-     * @param color Text color.
-     * @param size Text size.
-     */
-    protected void changeMainText(String text, int color, float size, long delayMilis) {
-        textView.setText(text);
-        textView.setTextSize(size);
-        textView.setTextColor(color);
-        if (delayMilis > 0) {
-            mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                textView.setText("");
-            }
-        }, delayMilis);
-        }
-    }
-
     @Override
     protected void onStop() {
         super.onStop();

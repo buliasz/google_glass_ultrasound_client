@@ -27,10 +27,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.TextView;
 
-import java.util.Locale;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Implementation of the main activity: transfers video and allows additional gestures.
@@ -38,7 +39,7 @@ import java.util.Locale;
 public class UsgSessionActivity extends BaseActivity {
 
     private static final String LOG_TAG = "USG";
-    private UsgCommunicationTask usgCommunicationTask;
+    UsgCommunicationTask usgCommunicationTask;
 
     /**
      * Handler used to keep the timer ticking once per second.
@@ -51,7 +52,7 @@ public class UsgSessionActivity extends BaseActivity {
     private final Runnable mTick = new Runnable() {
         @Override
         public void run() {
-            sessionTime += 1;
+            sessionDurationTime += 1;
             updateTimer();
             nextTick();
         }
@@ -60,23 +61,26 @@ public class UsgSessionActivity extends BaseActivity {
     /**
      * Keeps track of number of seconds of diagnosis.
      */
-    private int sessionTime;
+    private int sessionDurationTime;
+    Date sessionStartTime;
 
     /**
-     * TextView that displays the current diagnosis time.
+     * TextView that displays the current time.
      */
     private TextView mTimer;
-    private UsgSessionMenuHandler menuHandler;
+    private UsgSessionMenuHandler _menuHandler;
+    private Calendar _calendar;
+    private SimpleDateFormat _timeFormat;
 
     public UsgSessionActivity() {
-        menuHandler = new UsgSessionMenuHandler(this);
+        _menuHandler = new UsgSessionMenuHandler(this);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        getWindow().requestFeature(WindowUtils.FEATURE_VOICE_COMMANDS);
 
-//        getWindow().addFlags(WindowUtils.FEATURE_VOICE_COMMANDS);
+        super.onCreate(savedInstanceState);
 
         usgCommunicationTask = new UsgCommunicationTask(this);
         mTimer = (TextView) findViewById(R.id.timer);
@@ -85,7 +89,10 @@ public class UsgSessionActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        sessionTime = 0;
+        _calendar = Calendar.getInstance();
+        _timeFormat = new SimpleDateFormat("HH:mm:ss");
+        sessionStartTime = new Date();
+        sessionDurationTime = 0;
         updateTimer();
         nextTick();
         startConnectionToUsg();
@@ -135,7 +142,7 @@ public class UsgSessionActivity extends BaseActivity {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         if (featureId == WindowUtils.FEATURE_VOICE_COMMANDS
                 || featureId == Window.FEATURE_OPTIONS_PANEL) {
-            menuHandler.HandleItem(item.getItemId());
+            _menuHandler.HandleItem(item.getItemId());
             return true;
         }
         return super.onMenuItemSelected(featureId, item);
@@ -148,16 +155,16 @@ public class UsgSessionActivity extends BaseActivity {
                 openOptionsMenu();
                 break;
             case SWIPE_LEFT:
-                commandAreaUp();
+                sendCommand(Command.AREA_UP);
                 break;
             case SWIPE_RIGHT:
-                commandAreaDown();
+                sendCommand(Command.AREA_DOWN);
                 break;
             case SWIPE_UP:
-                commandGainUp();
+                sendCommand(Command.GAIN_UP);
                 break;
             case SWIPE_DOWN:
-                commandGainDown();
+                sendCommand(Command.GAIN_DOWN);
                 break;
             case TWO_LONG_PRESS:
                 permText("EXITING...");
@@ -175,13 +182,36 @@ public class UsgSessionActivity extends BaseActivity {
         mHandler.postDelayed(mTick, 1000);
     }
 
-    /** Updates the timer display with the current number of seconds remaining. */
+    /** Updates the timer display with the current time. */
     private void updateTimer() {
         // The code point U+EE01 in Roboto is the vertically centered colon used in the clock on
         // the Glass home screen.
-        String timeString = String.format(Locale.ENGLISH,
-            "%d\uee01%02d", sessionTime / 60, sessionTime % 60);
-        mTimer.setText(timeString);
+//        String timeString = String.format(Locale.ENGLISH,
+//            "%d\uee01%02d", sessionDurationTime / 60, sessionDurationTime % 60);
+//        mTimer.setText(timeString);
+
+        String strTime = _timeFormat.format(_calendar.getTime());
+        mTimer.setText(strTime);
+    }
+
+    /**
+     * Change main TextView text.
+     * @param text The new text to display.
+     * @param color Text color.
+     * @param size Text size.
+     */
+    private void changeMainText(String text, int color, float size, long delayMilis) {
+        textView.setText(text);
+        textView.setTextSize(size);
+        textView.setTextColor(color);
+        if (delayMilis > 0) {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    textView.setText("");
+                }
+            }, delayMilis);
+        }
     }
 
     /**
@@ -192,12 +222,17 @@ public class UsgSessionActivity extends BaseActivity {
         changeMainText(text, Color.WHITE, 16.5f, 0);
     }
 
+    void normalMessage(String text) {
+        changeMainText(text, Color.WHITE, 16.5f, 2000);
+    }
+
     /**
      * Error message to display (red with timeout).
      * @param text Message to display.
      */
     void errorMessage(String text) {
         changeMainText(text, Color.RED, 16.5f, 2000);
+        audioManager.playSoundEffect(Sounds.ERROR);
     }
 
     // USG communication methods
@@ -228,7 +263,7 @@ public class UsgSessionActivity extends BaseActivity {
      * This method is intended to be called from the main task.
      * @param command Command you want to send to the USG server.
      */
-    void SendCommand(String command) {
+    void sendCommand(String command) {
         if (usgCommunicationTask.isConnected() && usgCommunicationTask.commandQueue.isEmpty()) {
             try {
                 usgCommunicationTask.commandQueue.put(command);
@@ -241,26 +276,7 @@ public class UsgSessionActivity extends BaseActivity {
         }
     }
 
-    /**
-     * Gesture method calls.
-     */
-    protected void commandFreeze() {
-        SendCommand(UsgCommunicationTask.COMMAND_FREEZE);
-    }
-
-    protected void commandAreaUp() {
-        SendCommand(UsgCommunicationTask.COMMAND_AREA_UP);
-    }
-
-    protected void commandAreaDown() {
-        SendCommand(UsgCommunicationTask.COMMAND_AREA_DOWN);
-    }
-
-    protected void commandGainUp() {
-        SendCommand(UsgCommunicationTask.COMMAND_GAIN_UP);
-    }
-
-    protected void commandGainDown() {
-        SendCommand(UsgCommunicationTask.COMMAND_GAIN_DOWN);
+    public byte[] getLastUsgPictureBytes() {
+        return usgCommunicationTask.getLastUsgPictureBytes();
     }
 }

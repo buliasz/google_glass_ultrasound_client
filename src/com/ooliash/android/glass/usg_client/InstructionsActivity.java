@@ -156,21 +156,11 @@ public class InstructionsActivity extends BaseActivity {
     }
 
     private void permText(String text) {
-        changeMainText(text, Color.WHITE, 16.5f, 0);
-    }
-
-    void errorMessage(String text) {
-        changeMainText(text, Color.RED, 16.5f, 2000);
     }
 
 
     protected void startConnectionToUsg() {
         Log.d(LOG_TAG, "Starting communication task...");
-        changeMainText(
-                "Connecting to PJA USG...",
-                Color.RED,
-                26.5f,
-                0);
     }
 
     protected void cancelUsgCommunicationTask() {

@@ -29,7 +29,7 @@
     <string name="time_summary">Time: %1$ds</string>
 
     <!-- Menu item text to start a new USG session. -->
-    <string name="new_session">New USG session</string>
+    <string name="new_session">New session</string>
 
     <!-- Menu item text for options menu. -->
     <string name="options">Options</string>
@@ -55,7 +55,7 @@
     <string name="sine_16_cycles_25_mhz">Sine 16 cycles, 25 MHz</string>
     <string name="_13_bit_barker_20_mhz">13-bit Barker, 20 MHz</string>
     <string name="_13_bit_barker_35_mhz">13-bit Barker, 35 MHz</string>
-    <string name="_16_bit_chirp_15_25_mhz">16-bit Chirp, 15-25 Mhz</string>
+    <string name="_16_bit_chirp_15_25_mhz">16-bit Chirp, 15-25 MHz</string>
 
     <!-- The tutorial instructions. -->
     <string-array name="tutorial_phrases">
