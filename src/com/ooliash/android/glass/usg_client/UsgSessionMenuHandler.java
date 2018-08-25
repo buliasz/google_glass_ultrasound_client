@@ -31,6 +31,18 @@ public class UsgSessionMenuHandler {
             case R.id.freeze_option:
                 context.sendCommand(Command.FREEZE);
                 break;
+            case R.id.gain_up:
+                context.sendCommand(Command.GAIN_UP);
+                break;
+            case R.id.gain_down:
+                context.sendCommand(Command.GAIN_DOWN);
+                break;
+            case R.id.area_up:
+                context.sendCommand(Command.AREA_UP);
+                break;
+            case R.id.area_down:
+                context.sendCommand(Command.AREA_DOWN);
+                break;
             case R.id.save_picture_option:
                 savePicture();
                 break;
@@ -72,6 +84,8 @@ public class UsgSessionMenuHandler {
                 break;
             case R.id.close_session:
                 context.finish();
+                break;
+            case R.id.cancel:
                 break;
             default:
                 Log.e(LOG_TAG, "Unknown session menu item ID."); // + item.getTitle()

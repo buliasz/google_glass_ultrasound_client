@@ -125,15 +125,15 @@ public class MainActivity extends Activity {
                         }
                     });
                     return true;
-                case R.id.instructions:
-                    Log.d(LOG_TAG, "Voice: Instructions");
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            startInstructions();
-                        }
-                    });
-                    return true;
+//                case R.id.instructions:
+//                    Log.d(LOG_TAG, "Voice: Instructions");
+//                    mHandler.post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            startInstructions();
+//                        }
+//                    });
+//                    return true;
                 case R.id.exit:
                     Log.d(LOG_TAG, "Voice: Exit");
                     finish();

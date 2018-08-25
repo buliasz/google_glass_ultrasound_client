@@ -89,13 +89,16 @@ public abstract class BaseActivity extends Activity {
      */
     private TextView batteryState;
 
-    int batteryLevel = 0;
+    int lastBatteryLevel = 0;
 
     private BroadcastReceiver batteryInfoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-            batteryState.setText(buildBatteryBar());
+            int batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+            if (batteryLevel != lastBatteryLevel) {
+                lastBatteryLevel = batteryLevel;
+                batteryState.setText(buildBatteryBar());
+            }
         }
     };
 
@@ -154,12 +157,12 @@ public abstract class BaseActivity extends Activity {
      * Builds and returns a spanned string containing colorized battery level status.
      */
     private CharSequence buildBatteryBar() {
-        int batteryColor = batteryLevel < 25 ? Color.RED
-                : batteryLevel < 50 ? Color.MAGENTA : Color.GREEN;
+        int batteryColor = lastBatteryLevel < 25 ? Color.RED
+                : lastBatteryLevel < 50 ? Color.MAGENTA : Color.GREEN;
 
         SpannableStringBuilder builder = new SpannableStringBuilder();
         for (int i = 0; i < 5; i++) {
-            if (i < (batteryLevel + 10) / 20) {
+            if (i < (lastBatteryLevel + 10) / 20) {
                 builder.append(BATTERY_FILLED_PART_CHARACTER);
                 builder.setSpan(
                         new ForegroundColorSpan(batteryColor),

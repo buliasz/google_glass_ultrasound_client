@@ -32,6 +32,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Implementation of the main activity: transfers video and allows additional gestures.
@@ -90,7 +91,7 @@ public class UsgSessionActivity extends BaseActivity {
     protected void onStart() {
         super.onStart();
         _calendar = Calendar.getInstance();
-        _timeFormat = new SimpleDateFormat("HH:mm:ss");
+        _timeFormat = new SimpleDateFormat("HH:mm", Locale.US);
         sessionStartTime = new Date();
         sessionDurationTime = 0;
         updateTimer();
@@ -118,16 +119,19 @@ public class UsgSessionActivity extends BaseActivity {
      */
     @Override
     public boolean onCreatePanelMenu(int featureId, Menu menu) {
-        if (featureId == WindowUtils.FEATURE_VOICE_COMMANDS
-                || featureId == Window.FEATURE_OPTIONS_PANEL) {
-            getMenuInflater().inflate(R.menu.session_menu, menu);
+        if (featureId == Window.FEATURE_OPTIONS_PANEL) {
+            getMenuInflater().inflate(R.menu.session_menu_touch, menu);
+            return true;
+        }
+        if (featureId == WindowUtils.FEATURE_VOICE_COMMANDS) {
+            getMenuInflater().inflate(R.menu.session_menu_voice, menu);
             return true;
         }
         return super.onCreatePanelMenu(featureId, menu);
     }
 
     /**
-     * Default implementation of
+     * Implementation of
      * {@link Window.Callback#onMenuItemSelected}
      * for activities.  This calls through to the new
      * {@link #onOptionsItemSelected} method for the

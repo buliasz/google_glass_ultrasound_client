@@ -180,18 +180,6 @@ public class WindowsSocketCommunication {
         }
     }
 
-//    InetAddress getBroadcastAddress() throws IOException {
-//        WifiManager wifi = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-//        DhcpInfo dhcp = wifi.getDhcpInfo();
-//        // handle null somehow
-//
-//        int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;
-//        byte[] quads = new byte[4];
-//        for (int k = 0; k < 4; k++)
-//            quads[k] = (byte) ((broadcast >> k * 8) & 0xFF);
-//        return InetAddress.getByAddress(quads);
-//    }
-
     /**
      * Finds USG server using UDP broadcast "looking for USG server".
      */
@@ -239,12 +227,10 @@ public class WindowsSocketCommunication {
      * @throws IOException
      */
     private int ReceiveInt() throws IOException {
-//        networkIndicateDataPop();
         int count = inputStream.read(intBuffer, 0, 4);
         if (count != 4) {
             throw new IOException("Couldn't read 4 bytes [read " + count + "]");
         }
-//        networkIndicateNoDataTransfer();
         return (((intBuffer[3] & 0xFF) << 24)
                 | ((intBuffer[2] & 0xFF) << 16)
                 | ((intBuffer[1] & 0xFF) << 8)

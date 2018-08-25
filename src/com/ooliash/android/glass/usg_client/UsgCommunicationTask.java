@@ -67,12 +67,12 @@ class UsgCommunicationTask extends AsyncTask<Void, String, Void> {
                 communication.connectToUsgServer();
                 isConnected = true;
                 publishProgress(SET_MAIN_TEXT, ""); // clear command from main text
+
                 Log.d(LOG_TAG, "connected...");
                 commandQueue.add(Command.GET_PICTURE);
                 commandQueue.add(Command.GET_GAIN);
                 commandQueue.add(Command.GET_AREA);
 
-                audioManager.playSoundEffect(Sounds.SUCCESS);
                 while (communication.isConnected() && !isCancelled()) {
                     String command = commandQueue.poll();
                     if (command == null) {
@@ -116,18 +116,6 @@ class UsgCommunicationTask extends AsyncTask<Void, String, Void> {
         publishProgress(ERROR_MESSAGE, message); // clear command from main text
     }
 
-//    private void networkIndicateDataPush() {
-//        publishProgress(Command.NETWORK_STATUS, "\u25b2"); // black up-pointing small triangle
-//    }
-//
-//    private void networkIndicateDataPop() {
-//        publishProgress(Command.NETWORK_STATUS, "\u25bc"); // black down-pointing small triangle
-//    }
-//
-//    private void networkIndicateNoDataTransfer() {
-//        publishProgress(Command.NETWORK_STATUS, " ");
-//    }
-
     @Override
     protected void onProgressUpdate(String... progressData) {
         if (progressData.length <= 0) {
@@ -144,8 +132,6 @@ class UsgCommunicationTask extends AsyncTask<Void, String, Void> {
             context.textView.setText(progressData[1]);
         } else if (command == ERROR_MESSAGE) {
             context.errorMessage(progressData[1]);
-//        } else if (command == Command.NETWORK_STATUS) {
-//            context.networkIndicatorTextView.setText(progressData[1]);
         } else if (command == Command.GAIN_UP || command == Command.GAIN_DOWN || command == Command.GET_GAIN) {
             context.gainTextView.setText("\u2195" + progressData[1]);
             context.textView.setText(""); // clear command from main text

@@ -20,10 +20,10 @@
         android:id="@+id/new_session"
         android:icon="@drawable/ic_usg"
         android:title="@string/new_session"/>
-    <item
-        android:id="@+id/instructions"
-        android:icon="@drawable/ic_help_50"
-        android:title="@string/instructions"/>
+    <!--<item-->
+        <!--android:id="@+id/instructions"-->
+        <!--android:icon="@drawable/ic_help_50"-->
+        <!--android:title="@string/instructions"/>-->
     <item
         android:id="@+id/exit"
         android:icon="@drawable/ic_stop"

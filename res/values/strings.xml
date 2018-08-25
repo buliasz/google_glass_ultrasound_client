@@ -36,11 +36,19 @@
 
     <!-- Menu item text to display the application instructions. -->
     <string name="instructions">Instructions</string>
+
+    <!-- Session menu. -->
     <string name="freeze">Freeze</string>
+    <string name="gain">Gain</string>
+    <string name="gain_up">Gain up</string>
+    <string name="gain_down">Gain down</string>
+    <string name="area">Area</string>
+    <string name="area_up">Area up</string>
+    <string name="area_down">Area down</string>
     <string name="save_picture">Save picture</string>
     <string name="close_session">Close session</string>
+    <string name="cancel">Cancel</string>
     <string name="exit">Exit</string>
-    <string name="gain">Gain</string>
     <string name="tx_signal">TX Signal</string>
     <string name="palette">Palette</string>
     <string name="tgc">TGC</string>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/freeze_option"
+        android:title="@string/freeze"/>
+    <item android:id="@+id/gain_sub"
+        android:title="@string/gain">
+        <menu>
+            <item android:id="@+id/gain_up"
+                android:title="@string/gain_up"/>
+            <item android:id="@+id/gain_down"
+                android:title="@string/gain_down"/>
+        </menu>
+    </item>
+    <item android:id="@+id/area_sub"
+        android:title="@string/area">
+        <menu>
+            <item android:id="@+id/area_up"
+                android:title="@string/area_up"/>
+            <item android:id="@+id/area_down"
+                android:title="@string/area_down"/>
+        </menu>
+    </item>
+    <item android:id="@+id/save_picture_option"
+        android:title="@string/save_picture"/>
+    <item android:id="@+id/close_session"
+        android:title="@string/close_session"/>
+    <item android:id="@+id/cancel"
+        android:title="@string/cancel"/>
+</menu>
